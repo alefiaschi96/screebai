@@ -1,0 +1,58 @@
+// List of random words for drawing prompts
+export const words = [
+  "gatto",
+  "cane",
+  "casa",
+  "albero",
+  "sole",
+  "luna",
+  "stella",
+  "fiore",
+  "barca",
+  "aereo",
+  "automobile",
+  "montagna",
+  "mare",
+  "fiume",
+  "pesce",
+  "uccello",
+  "elefante",
+  "giraffa",
+  "leone",
+  "tigre",
+  "scimmia",
+  "farfalla",
+  "ragno",
+  "formica",
+  "libro",
+  "penna",
+  "matita",
+  "tavolo",
+  "sedia",
+  "letto",
+  "porta",
+  "finestra",
+  "telefono",
+  "computer",
+  "orologio",
+  "scarpa",
+  "cappello",
+  "occhiali",
+  "ombrello",
+  "pallone",
+  "bicicletta",
+  "treno",
+  "nuvola",
+  "pioggia",
+  "neve",
+  "arcobaleno",
+  "gelato",
+  "pizza",
+  "torta"
+];
+
+// Function to get a random word from the list
+export const getRandomWord = (): string => {
+  const randomIndex = Math.floor(Math.random() * words.length);
+  return words[randomIndex];
+};
