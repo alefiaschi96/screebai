@@ -148,29 +148,29 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
       </div>
       
       {/* Tools */}
-      <div className="flex justify-between items-center mt-4 px-2">
-        <div className="flex space-x-2">
+      <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 shadow-lg py-3 px-4 flex flex-wrap justify-between items-center gap-2 md:static md:bg-transparent md:shadow-none md:mt-4 md:px-2 md:py-0">
+        <div className="flex flex-wrap gap-2">
           <button
-            className={`p-2 rounded-md ${currentTool === 'pen' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`p-2 rounded-md text-sm ${currentTool === 'pen' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setCurrentTool('pen')}
           >
             Penna
           </button>
           <button
-            className={`p-2 rounded-md ${currentTool === 'eraser' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`p-2 rounded-md text-sm ${currentTool === 'eraser' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setCurrentTool('eraser')}
           >
             Gomma
           </button>
           <button
-            className="p-2 bg-red-500 text-white rounded-md"
+            className="p-2 bg-red-500 text-white rounded-md text-sm"
             onClick={clearCanvas}
           >
             Cancella tutto
           </button>
         </div>
         <button
-          className="p-2 bg-green-500 text-white rounded-md"
+          className="p-2 bg-green-500 text-white rounded-md text-sm font-bold"
           onClick={exportImage}
         >
           Finito
