@@ -1,11 +1,17 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { Session, User } from "@supabase/supabase-js";
 
-// Define the shape of our auth context
+type UserScore = {
+  id: number;
+  user_id: string;
+  user_nick: string;
+  score: number;
+};
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
@@ -16,15 +22,6 @@ type AuthContextType = {
   updateScore: (newScore: number) => void;
 };
 
-// Definizione del tipo per i dati del punteggio
-type UserScore = {
-  id: number;
-  user_id: string;
-  user_nick: string;
-  score: number;
-};
-
-// Create the context with a default value
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
@@ -35,10 +32,8 @@ const AuthContext = createContext<AuthContextType>({
   updateScore: () => {},
 });
 
-// Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
-// Provider component that wraps the app and makes auth object available to any child component that calls useAuth()
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -46,46 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    // Get session data on mount
-    const getSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error("Error getting session:", error);
-      }
-
-      if (session?.user) {
-        const score = await fetchUserScore(session.user.id);
-        setUserScore(score);
-      }
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    };
-
-    getSession();
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  // Funzione per recuperare il record del punteggio dell'utente
+  // Funzione per recuperare il punteggio dell'utente
   const fetchUserScore = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -100,30 +56,136 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return data as UserScore | null;
-    } catch (error) {
-      console.error("Exception fetching user score:", error);
+    } catch (err) {
+      console.error("Exception fetching user score:", err);
       return null;
     }
   };
 
-  // Function to sign out
+  // Utilizziamo un useEffect separato per la gestione degli eventi di autenticazione
+  useEffect(() => {
+    let mounted = true;
+
+    // Configura il listener per i cambiamenti dello stato di autenticazione
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
+
+      if (newSession) {
+        setSession(newSession);
+        setUser(newSession.user);
+        
+        // Reindirizza dalla login se necessario
+        if (window.location.pathname === "/login") {
+          router.push("/");
+        }
+      } else {
+        setSession(null);
+        setUser(null);
+        setUserScore(null);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [router]);
+
+  // Utilizziamo un useEffect separato per il caricamento iniziale della sessione
+  useEffect(() => {
+    let mounted = true;
+
+    // Funzione non-bloccante per caricare la sessione
+    const loadSession = () => {
+      supabase.auth.getSession()
+        .then(({ data, error }) => {
+          if (!mounted) return;
+          
+          if (error) {
+            console.error("Error getting session:", error);
+            setIsLoading(false);
+            return;
+          }
+          
+          if (data.session) {
+            setSession(data.session);
+            setUser(data.session.user);
+            
+            // Carica il punteggio dell'utente in modo non-bloccante
+            fetchUserScore(data.session.user.id)
+              .then(score => {
+                if (mounted) {
+                  setUserScore(score);
+                }
+              })
+              .catch(err => {
+                console.error("Error loading user score:", err);
+              })
+              .finally(() => {
+                if (mounted) setIsLoading(false);
+              });
+          } else {
+            setIsLoading(false);
+          }
+        })
+        .catch(err => {
+          console.error("Unexpected error loading session:", err);
+          if (mounted) setIsLoading(false);
+        });
+    };
+
+    // Carica la sessione in modo non-bloccante
+    loadSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  
+  // Utilizziamo un useEffect separato per caricare il punteggio quando l'utente cambia
+  useEffect(() => {
+    if (!user) return;
+    
+    let mounted = true;
+    
+    fetchUserScore(user.id)
+      .then(score => {
+        if (mounted) {
+          setUserScore(score);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading score after user change:", err);
+      });
+      
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
+
+  // Funzione per effettuare il logout
   const signOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      setIsLoading(true);
+      await supabase.auth.signOut();
+      setUser(null);
+      setUserScore(null);
+      setSession(null);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Funzione per aggiornare il punteggio dell'utente nel contesto
+  // Funzione per aggiornare il punteggio dell'utente
   const updateScore = (newScore: number) => {
     if (!userScore) return;
-    
-    // Aggiorna lo stato locale del punteggio
-    setUserScore({
-      ...userScore,
-      score: newScore
-    });
+    setUserScore({ ...userScore, score: newScore });
   };
 
-  // Value to be provided to consuming components
+  // Valori del contesto di autenticazione
   const value = {
     user,
     session,
@@ -134,5 +196,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateScore,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {isLoading ? (
+        <div className="min-h-screen flex items-center justify-center bg-black text-white">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+        </div>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  );
 }

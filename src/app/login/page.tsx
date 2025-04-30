@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 import { generateNickname } from "@/data/nicknames";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,29 +18,23 @@ export default function LoginPage() {
     let isUnique = false;
     let nickname = "";
 
-    // Continua a generare nickname finché non ne trova uno unico
-    if (!isUnique) {
-      // Genera un nuovo nickname
+    while (!isUnique) {
       nickname = generateNickname();
 
-      // Verifica se il nickname è già in uso
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("scores")
         .select("user_nick")
         .eq("user_nick", nickname)
         .maybeSingle();
 
-      // Se non ci sono risultati, il nickname è unico
-      if (error && error.code === "PGRST116") {
-        // codice errore per "nessun risultato"
-        isUnique = true;
-      } else if (error) {
+      if (error) {
         console.error("Errore durante la verifica del nickname:", error);
-        // In caso di errore di query, genera comunque un nuovo nickname
-        isUnique = false;
+        continue;
       }
 
-      // Se data esiste, il nickname è già in uso, continua il ciclo
+      if (!data) {
+        isUnique = true;
+      }
     }
 
     return nickname;
@@ -62,7 +56,7 @@ export default function LoginPage() {
 
         if (error) throw error;
 
-        // Redirect to home page after successful login
+        // Redirect immediato
         router.push("/");
       } else {
         // Handle registration
@@ -97,10 +91,10 @@ export default function LoginPage() {
               );
             }
           }
-
-          // Redirect to home page after successful login
-          router.push("/");
         }
+
+        // Redirect immediato
+        router.push("/");
       }
     } catch (err: Error | unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
