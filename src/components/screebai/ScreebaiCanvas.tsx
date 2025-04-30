@@ -8,12 +8,22 @@ interface DrawingCanvasProps {
 
 type Tool = 'pen' | 'eraser';
 
-const DrawingCanvas = ({ onSubmit }: DrawingCanvasProps) => {
+const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<Tool>('pen');
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   
+  // Clear canvas function (definita prima dell'useEffect)
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (ctx && canvas) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
   // Set up canvas and context
   useEffect(() => {
     const updateCanvasSize = () => {
@@ -41,11 +51,18 @@ const DrawingCanvas = ({ onSubmit }: DrawingCanvasProps) => {
     // Initialize canvas size
     updateCanvasSize();
     
+    // Assicuriamoci che il canvas abbia uno sfondo bianco dopo un breve ritardo
+    // per gestire eventuali problemi di timing
+    const initTimer = setTimeout(() => {
+      clearCanvas();
+    }, 100);
+    
     // Update canvas size on window resize
     window.addEventListener('resize', updateCanvasSize);
     
     return () => {
       window.removeEventListener('resize', updateCanvasSize);
+      clearTimeout(initTimer);
     };
   }, []);
 
@@ -100,21 +117,14 @@ const DrawingCanvas = ({ onSubmit }: DrawingCanvasProps) => {
     ctx.moveTo(x, y);
   };
 
-  // Clear canvas
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (ctx && canvas) {
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-  };
+
 
   // Export canvas as PNG in base64 format
   const exportImage = () => {
     if (canvasRef.current) {
       const dataUrl = canvasRef.current.toDataURL('image/png');
       onSubmit(dataUrl);
+      clearCanvas();
     }
   };
 
@@ -170,4 +180,4 @@ const DrawingCanvas = ({ onSubmit }: DrawingCanvasProps) => {
   );
 };
 
-export default DrawingCanvas;
+export default ScreebaiCanvas;

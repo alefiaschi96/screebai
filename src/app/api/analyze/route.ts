@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Extract the single word response
-    const result = response.choices[0]?.message?.content?.trim() || "Indefinito";
+    const result = (response.choices[0]?.message?.content?.trim().toLowerCase() || "Indefinito").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
     return NextResponse.json({ result });
   } catch (error) {

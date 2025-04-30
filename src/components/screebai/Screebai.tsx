@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DrawingCanvas from './DrawingCanvas';
 import { getRandomWord } from '@/data/words';
-import { analyzeDrawing } from '../services/openaiService';
+import { analyzeDrawing } from '../../services/openaiService';
+import ScreebaiCanvas from './ScreebaiCanvas';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 1;
 
-const DrawingApp = () => {
+const ScreebAi = () => {
+  const { user, userScore } = useAuth();
   const [word, setWord] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [aiResult, setAiResult] = useState<string | null>(null);
@@ -15,12 +18,59 @@ const DrawingApp = () => {
   const [score, setScore] = useState<number>(0);
   const [attempts, setAttempts] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [, setUpdatingScore] = useState<boolean>(false);
 
   // Get a random word on component mount
   useEffect(() => {
     resetGame();
   }, []);
 
+  // Aggiorna il punteggio dell'utente nel database
+  const { updateScore } = useAuth();
+  
+  const updateUserScore = async (newPoints: number) => {
+    if (!user || !userScore) return;
+    
+    try {
+      setUpdatingScore(true);
+      
+      // Ottieni il punteggio attuale dal database
+      const { data: currentScoreData, error: fetchError } = await supabase
+        .from('scores')
+        .select('score')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (fetchError) {
+        console.error('Errore durante il recupero del punteggio attuale:', fetchError);
+        return;
+      }
+      
+      // Calcola il nuovo punteggio totale
+      const currentScore = currentScoreData?.score || 0;
+      const updatedScore = currentScore + newPoints;
+      console.log(`Aggiornamento punteggio in corso... Da ${currentScore} a ${updatedScore}`);
+      
+      // Aggiorna il record nella tabella scores
+      const { error } = await supabase
+        .from('scores')
+        .update({ score: updatedScore })
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error('Errore durante l\'aggiornamento del punteggio:', error);
+      } else {
+        console.log(`Punteggio aggiornato con successo! Nuovo punteggio: ${updatedScore}`);
+        // Aggiorna anche il punteggio nel contesto di autenticazione
+        updateScore(updatedScore);
+      }
+    } catch (error) {
+      console.error('Errore durante l\'aggiornamento del punteggio:', error);
+    } finally {
+      setUpdatingScore(false);
+    }
+  };
+  
   // Reset the game
   const resetGame = () => {
     setWord(getRandomWord());
@@ -68,8 +118,13 @@ const DrawingApp = () => {
       
       // Controlla se il gioco è finito
       if (newAttempts >= MAX_ATTEMPTS) {
-        // Il gioco è finito dopo 5 tentativi
+        // Il gioco è finito dopo il massimo numero di tentativi
+        // Calcola il punteggio finale
+        const finalScore = isCorrect ? score + 1 : score;
+        
         setTimeout(() => {
+          // Aggiorna il punteggio dell'utente nel database
+          updateUserScore(finalScore);
           setGameOver(true);
         }, 3000);
       } else {
@@ -87,7 +142,7 @@ const DrawingApp = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full p-4 md:p-6">
+    <div className="flex flex-col h-full w-full p-4 md:p-6">
       {/* Game stats */}
       <div className="flex justify-between items-center mb-2">
         <div className="text-sm font-semibold">Tentativo: {attempts}/{MAX_ATTEMPTS}</div>
@@ -135,7 +190,7 @@ const DrawingApp = () => {
           
           {/* Drawing canvas */}
           <div className="flex-grow">
-            <DrawingCanvas onSubmit={handleSubmit} />
+            <ScreebaiCanvas onSubmit={handleSubmit} />
           </div>
         </>
       )}
@@ -143,4 +198,4 @@ const DrawingApp = () => {
   );
 };
 
-export default DrawingApp;
+export default ScreebAi;
