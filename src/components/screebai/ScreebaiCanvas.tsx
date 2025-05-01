@@ -97,8 +97,8 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
       x = touch.clientX - rect.left;
       y = touch.clientY - rect.top;
       
-      // Prevent scrolling when drawing
-      e.preventDefault();
+      // Non chiamiamo preventDefault() qui perché causa errori con eventi passivi
+      // Lo scrolling è prevenuto tramite CSS touch-action: none
     } else {
       // Mouse event
       const rect = canvas.getBoundingClientRect();
@@ -137,6 +137,7 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
           width={canvasSize.width}
           height={canvasSize.height}
           className="absolute top-0 left-0 touch-none"
+          style={{ touchAction: 'none' }} /* Previene lo scrolling durante il disegno */
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
