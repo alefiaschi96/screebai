@@ -14,8 +14,10 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="font-bold text-xl text-indigo-600">
-                Cogames
+              <Link href="/" className="flex items-center">
+                <span className="text-2xl font-bold" style={{ color: "var(--secondary)" }}>
+                  <span style={{ color: "var(--primary)" }}>Co</span>games
+                </span>
               </Link>
             </div>
           </div>
@@ -32,7 +34,8 @@ export default function Navbar() {
                     </span>
                     <button
                       onClick={signOut}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
+                      style={{ backgroundColor: "var(--primary)" }}
                     >
                       Logout
                     </button>
@@ -40,7 +43,8 @@ export default function Navbar() {
                 ) : (
                   <Link
                     href="/login"
-                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
+                    style={{ backgroundColor: "var(--primary)" }}
                   >
                     Login
                   </Link>

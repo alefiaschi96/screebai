@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getRandomWord } from "@/data/words";
 import { analyzeDrawing } from "../../services/openaiService";
 import ScreebaiCanvas from "./ScreebaiCanvas";
@@ -17,14 +17,60 @@ const ScreebAi = () => {
   const [attempts, setAttempts] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [, setUpdatingScore] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasSubmittedRef = useRef<boolean>(false);
 
-  console.log(process.env.NEXT_PUBLIC_MAX_ATTEMPTS);
-  const MAX_ATTEMPTS = parseInt(process.env.NEXT_PUBLIC_MAX_ATTEMPTS as string) || 5;
+  // Costanti dalle variabili d'ambiente
+  const MAX_ATTEMPTS =
+    parseInt(process.env.NEXT_PUBLIC_MAX_ATTEMPTS as string) || 5;
+  const MAX_TIME_PER_ATTEMPT =
+    parseInt(process.env.NEXT_PUBLIC_TIME_PER_ATTEMPT as string) || 60; // Tempo in secondi
 
   // Get a random word on component mount
   useEffect(() => {
     resetGame();
+
+    // Cleanup del timer quando il componente viene smontato
+    return () => {
+      stopTimer();
+    };
   }, []);
+
+  // Funzione per gestire il timer
+  const startTimer = () => {
+    setTimeLeft(MAX_TIME_PER_ATTEMPT);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+
+          if (!isAnalyzing && !hasSubmittedRef.current) {
+            hasSubmittedRef.current = true; // Imposta a true per evitare duplicati
+            const canvas = document.querySelector("canvas");
+            if (canvas) {
+              const imageDataUrl = canvas.toDataURL("image/png");
+              handleSubmit(imageDataUrl);
+            }
+          }
+
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+  };
+
+  // Ferma il timer
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
 
   // Aggiorna il punteggio dell'utente nel database
   const { updateScore } = useAuth();
@@ -81,12 +127,13 @@ const ScreebAi = () => {
 
   // Reset the game
   const resetGame = () => {
-    setWord(getRandomWord());
-    setShowResult(false);
-    setAiResult(null);
+    // Resettiamo tutti gli stati del gioco
     setScore(0);
     setAttempts(0);
     setGameOver(false);
+    hasSubmittedRef.current = false;
+    // Iniziamo un nuovo round (che imposta la parola e avvia il timer)
+    startNewRound();
   };
 
   // Start a new round
@@ -94,6 +141,9 @@ const ScreebAi = () => {
     setWord(getRandomWord());
     setShowResult(false);
     setAiResult(null);
+    hasSubmittedRef.current = false;
+    // Avvia il timer per questo tentativo
+    startTimer();
   };
 
   // Check if the AI result matches the word (case insensitive)
@@ -104,43 +154,38 @@ const ScreebAi = () => {
   // Handle drawing submission
   const handleSubmit = async (imageDataUrl: string) => {
     try {
+      stopTimer();
       setIsAnalyzing(true);
       setShowResult(true);
 
-      // Chiamata a GPT-4 Vision per analizzare l'immagine
       const result = await analyzeDrawing(imageDataUrl);
       setAiResult(result);
-
       console.log("AI ha riconosciuto:", result);
 
-      // Incrementa il numero di tentativi
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
+      // Aggiorna il numero di tentativi in modo sicuro
+      setAttempts((prevAttempts) => {
+        const newAttempts = prevAttempts + 1;
 
-      // Controlla se l'AI ha indovinato correttamente
-      const isCorrect = checkMatch(result, word);
-      if (isCorrect) {
-        // Incrementa il punteggio
-        setScore((prevScore) => prevScore + 1);
-      }
+        const isCorrect = checkMatch(result, word);
+        if (isCorrect) {
+          setScore((prevScore) => prevScore + 1);
+        }
 
-      // Controlla se il gioco è finito
-      if (newAttempts >= MAX_ATTEMPTS) {
-        // Il gioco è finito dopo il massimo numero di tentativi
-        // Calcola il punteggio finale
-        const finalScore = isCorrect ? score + 1 : score;
+        if (newAttempts >= MAX_ATTEMPTS) {
+          const finalScore = isCorrect ? score + 1 : score;
 
-        setTimeout(() => {
-          // Aggiorna il punteggio dell'utente nel database
-          updateUserScore(finalScore);
-          setGameOver(true);
-        }, 3000);
-      } else {
-        // Passa alla prossima parola dopo un breve ritardo
-        setTimeout(() => {
-          startNewRound();
-        }, 3000);
-      }
+          setTimeout(() => {
+            updateUserScore(finalScore);
+            setGameOver(true);
+          }, 30000);
+        } else {
+          setTimeout(() => {
+            startNewRound();
+          }, 30000);
+        }
+
+        return newAttempts;
+      });
     } catch (error) {
       console.error("Errore durante l'analisi dell'immagine:", error);
       alert("Si è verificato un errore durante l'analisi dell'immagine.");
@@ -152,9 +197,21 @@ const ScreebAi = () => {
   return (
     <div className="flex flex-col h-full w-full p-4 md:p-6">
       {/* Game stats */}
-      <div className="flex justify-between items-center mb-2">
+      <div
+        className="flex justify-between items-center mb-4 p-3 rounded-lg"
+        style={{
+          backgroundColor: "var(--light-blue)",
+          color: "var(--secondary-dark)",
+        }}
+      >
         <div className="text-sm font-semibold">
           Tentativo: {attempts}/{MAX_ATTEMPTS}
+        </div>
+        <div className="text-sm font-semibold">
+          Tempo:{" "}
+          <span className={`${timeLeft <= 10 ? "text-danger" : ""}`}>
+            {timeLeft}s
+          </span>
         </div>
         <div className="text-sm font-semibold">Punti: {score}</div>
       </div>
@@ -162,14 +219,22 @@ const ScreebAi = () => {
       {/* Game over screen */}
       {gameOver ? (
         <div className="flex flex-col items-center justify-center flex-grow text-center">
-          <h1 className="text-3xl font-bold mb-4">Gioco Finito!</h1>
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{ color: "var(--secondary)" }}
+          >
+            Gioco Finito!
+          </h1>
           <p className="text-2xl mb-6">
             Hai totalizzato{" "}
-            <span className="text-blue-600 font-bold">{score}</span> punti su{" "}
-            {MAX_ATTEMPTS} tentativi!
+            <span style={{ color: "var(--primary)", fontWeight: "bold" }}>
+              {score}
+            </span>{" "}
+            punti su {MAX_ATTEMPTS} tentativi!
           </p>
           <button
-            className="p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            className="btn-primary p-3 text-white rounded-full hover:shadow-lg transition-all"
+            style={{ backgroundColor: "var(--primary)" }}
             onClick={resetGame}
           >
             Gioca ancora
@@ -177,39 +242,78 @@ const ScreebAi = () => {
         </div>
       ) : (
         <>
-          {/* Word to draw */}
-          {!showResult ? (
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold mb-1">Disegna:</h1>
-              <p className="text-3xl font-bold text-blue-600">{word}</p>
-            </div>
-          ) : (
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold mb-1">
-                L&apos;AI ha riconosciuto:
-              </h1>
-              {isAnalyzing ? (
-                <p className="text-xl">Analisi in corso...</p>
+          {/* Contenitore con altezza fissa per evitare spostamenti nel layout */}
+          <div className="mb-6 flex flex-col" style={{ minHeight: "150px" }}>
+            {/* Word to draw o risultato AI */}
+            <div
+              className="text-center p-4 rounded-lg flex-grow flex flex-col justify-center"
+              style={{
+                backgroundColor: "var(--light-blue)",
+              }}
+            >
+              {!showResult ? (
+                /* Parola da disegnare */
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p
+                    className="text-3xl font-bold"
+                    style={{ color: "var(--primary-dark)" }}
+                  >
+                    {word}
+                  </p>
+                </div>
               ) : (
-                <>
-                  <p className="text-3xl font-bold text-green-600">
-                    {aiResult || "Non riconosciuto"}
-                  </p>
-                  <p className="mt-2">
-                    {checkMatch(aiResult || "", word) ? (
-                      <span className="text-green-600 font-bold">
-                        Corretto! +1 punto
-                      </span>
-                    ) : (
-                      <span className="text-red-600">
-                        Non corrisponde a &quot;{word}&quot;
-                      </span>
-                    )}
-                  </p>
-                </>
+                /* Risultato dell'AI */
+                <div className="flex flex-col items-center justify-center h-full">
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{ color: "var(--primary-dark)" }}
+                  >
+                    L&apos;AI ha riconosciuto:
+                  </h3>
+                  {isAnalyzing ? (
+                    <p
+                      className="text-xl"
+                      style={{ color: "var(--primary-dark)" }}
+                    >
+                      Analisi in corso...
+                    </p>
+                  ) : (
+                    <>
+                      <p
+                        className="text-3xl font-bold mb-3"
+                        style={{ color: "var(--primary-dark)" }}
+                      >
+                        {aiResult || "Non riconosciuto"}
+                      </p>
+                      <div>
+                        {checkMatch(aiResult || "", word) ? (
+                          <span
+                            className="font-bold px-3 py-1 rounded-full inline-block"
+                            style={{
+                              backgroundColor: "var(--success)",
+                              color: "white",
+                            }}
+                          >
+                            Corretto! +1 punto
+                          </span>
+                        ) : (
+                          <span
+                            className="font-bold px-3 py-1 rounded-full inline-block"
+                            style={{
+                              backgroundColor: "var(--danger)",
+                              color: "white",
+                            }}
+                          >
+                            Non corrisponde a &quot;{word}&quot;
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
             </div>
-          )}
+          </div>
 
           {/* Drawing canvas */}
           <div className="flex-grow pb-16 md:pb-0">

@@ -31,9 +31,11 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 overflow-y-auto">
-      <h1 className="text-2xl font-bold mb-6">Classifica Giocatori</h1>
-      <Leaderboard />
+    <div className="container mx-auto px-4 py-4 h-full flex flex-col">
+      <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--secondary)" }}></h1>
+      <div className="flex-grow overflow-hidden">
+        <Leaderboard />
+      </div>
     </div>
   );
 }

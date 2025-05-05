@@ -137,7 +137,7 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
           width={canvasSize.width}
           height={canvasSize.height}
           className="absolute top-0 left-0 touch-none"
-          style={{ touchAction: 'none' }} /* Previene lo scrolling durante il disegno */
+          style={{ touchAction: 'none' }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}

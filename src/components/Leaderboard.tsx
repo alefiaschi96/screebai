@@ -174,12 +174,13 @@ export default function Leaderboard() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Classifica Giocatori</h2>
+    <div className="h-full flex flex-col">
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-xl font-bold">Classifica</h2>
         <button
           onClick={refreshLeaderboard}
-          className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+          className="text-sm font-medium flex items-center rounded-full px-3 py-1"
+          style={{ backgroundColor: "var(--secondary)", color: "white" }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +207,7 @@ export default function Leaderboard() {
       )}
 
       {/* Layout a card per tutti i dispositivi */}
-      <div className="space-y-3">
+      <div className="space-y-2 overflow-y-auto flex-grow pb-2">
         {leaderboardData.map((entry, index) => {
           // Usa la posizione reale salvata nell'entry
           const position = entry.position || index + 1;
@@ -226,50 +227,51 @@ export default function Leaderboard() {
           return (
             <React.Fragment key={entry.id}>
               <div
-                className={`rounded-lg border p-3 flex items-center 
+                className={`rounded-lg border p-2 flex items-center 
                   ${
                     userScore?.user_id === entry.user_id
-                      ? "bg-indigo-50 border-indigo-200"
-                      : "bg-white border-gray-200"
+                      ? "border-primary"
+                      : "border-gray-200"
                   }
-                  ${isTopTwo ? "border-yellow-300" : ""}`}
+                  ${isTopTwo ? "border-primary" : ""}`}
+                style={{
+                  backgroundColor: userScore?.user_id === entry.user_id ? "rgba(44, 87, 112, 0.1)" : "white",
+                }}
               >
                 <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 
-                  ${isTopTwo ? "bg-yellow-100" : "bg-indigo-100"}`}
+                  className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mr-2`}
+                  style={{ 
+                    backgroundColor: isTopTwo ? "var(--primary)" : "var(--secondary)",
+                    color: "white"
+                  }}
                 >
-                  <span
-                    className={`font-bold text-sm ${
-                      isTopTwo ? "text-yellow-800" : "text-indigo-800"
-                    }`}
-                  >
+                  <span className="font-bold text-sm">
                     {position}
                   </span>
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow truncate">
                   <div
-                    className={`font-medium 
-                    ${
-                      userScore?.user_id === entry.user_id
-                        ? "text-indigo-600"
-                        : isTopTwo
-                        ? "text-yellow-700"
-                        : "text-gray-800"
-                    }`}
+                    className="font-medium text-sm truncate"
+                    style={{
+                      color: userScore?.user_id === entry.user_id 
+                        ? "var(--primary-dark)" 
+                        : isTopTwo 
+                        ? "var(--secondary-dark)" 
+                        : "var(--secondary-dark)"
+                    }}
                   >
                     {entry.user_nick}
                     {userScore?.user_id === entry.user_id && " (Tu)"}
                   </div>
                 </div>
                 <div
-                  className={`flex-shrink-0 px-3 py-1 rounded-full 
-                  ${isTopTwo ? "bg-yellow-100" : "bg-indigo-100"}`}
+                  className="flex-shrink-0 px-2 py-1 rounded-full"
+                  style={{ 
+                    backgroundColor: isTopTwo ? "var(--primary)" : "var(--secondary)",
+                    color: "white"
+                  }}
                 >
-                  <span
-                    className={`font-medium ${
-                      isTopTwo ? "text-yellow-800" : "text-indigo-800"
-                    }`}
-                  >
+                  <span className="font-medium text-sm">
                     {entry.score}
                   </span>
                 </div>
@@ -277,12 +279,12 @@ export default function Leaderboard() {
 
               {/* Separatore tra i top 2 e gli altri */}
               {showSeparator && (
-                <div className="relative py-3">
+                <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t" style={{ borderColor: "var(--light-blue)" }}></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-2 bg-white text-sm text-gray-500">
+                    <span className="px-2 text-xs font-medium rounded-full py-1" style={{ backgroundColor: "var(--secondary)", color: "white" }}>
                       La tua posizione
                     </span>
                   </div>
