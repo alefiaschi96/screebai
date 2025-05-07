@@ -4,10 +4,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Locale } from "@/i18n/settings";
+import { use } from "react";
 
-export default function GamesPage() {
+export default function GamesPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = use(params);
   const { user, userScore, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation(locale);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -32,32 +41,17 @@ export default function GamesPage() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-4">
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-        <h1 className="text-xl font-bold mb-2">
-          Ciao,{" "}
-          <span style={{ color: "var(--primary)" }}>{userScore.user_nick}</span>
-          !
-        </h1>
-        <p className="text-gray-600 text-sm">
-          Benvenuto nella tua dashboard di gioco. Attualmente hai{" "}
-          <span className="font-semibold" style={{ color: "var(--primary)" }}>
-            {userScore.score} punti
-          </span>{" "}
-          in classifica.
-        </p>
-      </div>
-
       <h2
         className="text-lg font-bold mb-3"
         style={{ color: "var(--secondary)" }}
       >
-        Giochi disponibili
+        {t("games.title")}
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3">
         {/* Gioco 1 - Disegno (già sviluppato) */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all hover:shadow-md">
-          <Link href="/games/screebai" className="block">
+          <Link href="/screebai" className="block">
             <div className="flex items-center p-3">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center mr-3"
@@ -83,11 +77,10 @@ export default function GamesPage() {
                   className="font-bold text-base mb-1"
                   style={{ color: "var(--secondary)" }}
                 >
-                  ScreebAI
+                  {t("games.game1.title")}
                 </h3>
                 <p className="text-gray-600 text-xs">
-                  Disegna la parola indicata e fai indovinare all&apos;AI cosa
-                  hai disegnato.
+                  {t("games.game1.description")}
                 </p>
               </div>
             </div>

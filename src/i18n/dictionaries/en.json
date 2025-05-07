@@ -1,0 +1,61 @@
+{
+  "common": {
+    "appName": "Screebai",
+    "appDescription": "Drawing App",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "leaderboard": "Leaderboard",
+    "games": "Games",
+    "profile": "Profile"
+  },
+  "navbar": {
+    "points": "Points",
+    "logout": "Logout",
+    "login": "Login",
+    "leaderboard": "Leaderboard",
+    "games": "Games",
+    "email": "Email",
+    "password": "Password",
+    "needAccount": "If you don't have an account yet,",
+    "alreadyAccount": "Already have an account?",
+    "registerCTA": "register!",
+    "loginCTA": "login!"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot your password?",
+    "loading": "Loading...",
+    "error": {
+      "generic": "An error occurred",
+      "emailExists": "An account with this email already exists"
+    }
+  },
+  "home": {
+    "hello": "Hello",
+    "welcome1": "Welcome to CoGames. You have currently",
+    "welcome2": "in the leaderboard",
+    "points": "points"
+  },
+  "games": {
+    "title": "Games",
+    "play": "Play",
+    "game1": {
+      "title": "ScreebAI",
+      "description": "Draw the word indicated and let the AI guess what you drew."
+    }
+  },
+  "leaderboard": {
+    "yourPosition": "Your Position",
+    "refresh": "Refresh",
+    "noData": "No data available"
+  },
+  "errors": {
+    "nicknameVerification": "Error while verifying nickname",
+    "scoreCreation": "Error while creating score record"
+  }
+}

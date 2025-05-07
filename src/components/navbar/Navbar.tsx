@@ -1,12 +1,30 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Locale, i18n } from "@/i18n/settings";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const { user, signOut, isLoading, userScore } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [locale, setLocale] = useState<Locale>(i18n.defaultLocale as Locale);
+
+  // Otteniamo la lingua dal pathname
+  const pathname = usePathname();
+
+  // Estraiamo la lingua dal pathname
+  useEffect(() => {
+    const pathnameLocale = pathname?.split("/")[1];
+    if (pathnameLocale && i18n.locales.includes(pathnameLocale as Locale)) {
+      setLocale(pathnameLocale as Locale);
+    }
+  }, [pathname]);
+
+  const { t } = useTranslation(locale);
 
   return (
     <nav className="bg-white shadow-sm">
@@ -15,7 +33,10 @@ export default function Navbar() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
-                <span className="text-2xl font-bold" style={{ color: "var(--secondary)" }}>
+                <span
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--secondary)" }}
+                >
                   <span style={{ color: "var(--primary)" }}>Co</span>games
                 </span>
               </Link>
@@ -30,24 +51,34 @@ export default function Navbar() {
                       {userScore.user_nick || user.email}
                     </span>
                     <span className="text-sm text-gray-500 font-bold">
-                      Punti attuali: {userScore.score}
+                      {t("navbar.points")}: {userScore.score}
                     </span>
+                    {/* Language Switcher */}
+                    <div className="mr-4">
+                      <LanguageSwitcher />
+                    </div>
                     <button
                       onClick={signOut}
                       className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
                       style={{ backgroundColor: "var(--primary)" }}
                     >
-                      Logout
+                      {t("navbar.logout")}
                     </button>
                   </div>
                 ) : (
-                  <Link
-                    href="/login"
-                    className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
-                    style={{ backgroundColor: "var(--primary)" }}
-                  >
-                    Login
-                  </Link>
+                  <>
+                    {/* Language Switcher */}
+                    <div className="mr-4">
+                      <LanguageSwitcher />
+                    </div>
+                    <Link
+                      href="/login"
+                      className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
+                      style={{ backgroundColor: "var(--primary)" }}
+                    >
+                      {t("navbar.login")}
+                    </Link>
+                  </>
                 )}
               </>
             )}
@@ -60,24 +91,24 @@ export default function Navbar() {
                 href="/leaderboard"
                 className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-4 w-4 mr-1" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                   />
                 </svg>
-                Classifica
+                {t("navbar.leaderboard")}
               </Link>
             )}
-            
+
             {/* Menu button */}
             <button
               type="button"
@@ -85,7 +116,7 @@ export default function Navbar() {
               aria-expanded={isMenuOpen ? "true" : "false"}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">{t("navbar.menu")}</span>
               {/* Icon when menu is closed */}
               {!isMenuOpen ? (
                 <svg
@@ -131,7 +162,7 @@ export default function Navbar() {
           <div className="flex flex-col h-full">
             {/* Menu header with close button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <div className="font-bold text-xl text-indigo-600">Cogames</div>
+              <div className="font-bold text-xl text-indigo-600">CoGames</div>
               <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
@@ -152,7 +183,7 @@ export default function Navbar() {
                 </svg>
               </button>
             </div>
-            
+
             {/* Menu content */}
             <div className="flex-grow overflow-y-auto">
               {!isLoading && (
@@ -165,10 +196,11 @@ export default function Navbar() {
                           {userScore.user_nick || user.email}
                         </div>
                         <div className="text-indigo-600">
-                          Punti attuali: <span className="font-bold">{userScore.score}</span>
+                          {t("navbar.points")}{" "}
+                          <span className="font-bold">{userScore.score}</span>
                         </div>
                       </div>
-                      
+
                       {/* Navigation links */}
                       <div className="space-y-3">
                         <Link
@@ -176,24 +208,46 @@ export default function Navbar() {
                           className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <span className="text-gray-800 font-medium">I miei giochi</span>
-                          <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          <span className="text-gray-800 font-medium">
+                            {t("navbar.games")}
+                          </span>
+                          <svg
+                            className="h-5 w-5 text-gray-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </Link>
-                        
+
                         <Link
                           href="/leaderboard"
                           className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <span className="text-gray-800 font-medium">Classifica</span>
-                          <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          <span className="text-gray-800 font-medium">
+                            {t("navbar.leaderboard")}
+                          </span>
+                          <svg
+                            className="h-5 w-5 text-gray-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </Link>
                       </div>
-                      
+
                       {/* Logout button */}
                       <button
                         onClick={() => {
@@ -202,7 +256,7 @@ export default function Navbar() {
                         }}
                         className="w-full p-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                       >
-                        Logout
+                        {t("navbar.logout")}
                       </button>
                     </div>
                   ) : (
@@ -212,7 +266,7 @@ export default function Navbar() {
                         className="p-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Login
+                        {t("navbar.login")}
                       </Link>
                     </div>
                   )}

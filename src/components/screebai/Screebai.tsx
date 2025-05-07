@@ -177,11 +177,11 @@ const ScreebAi = () => {
           setTimeout(() => {
             updateUserScore(finalScore);
             setGameOver(true);
-          }, 30000);
+          }, 3000);
         } else {
           setTimeout(() => {
             startNewRound();
-          }, 30000);
+          }, 3000);
         }
 
         return newAttempts;
@@ -195,10 +195,10 @@ const ScreebAi = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full p-4 md:p-6">
+    <div className="flex flex-col h-full w-full p-2 md:p-6">
       {/* Game stats */}
       <div
-        className="flex justify-between items-center mb-4 p-3 rounded-lg"
+        className="flex justify-between items-center mb-2 p-2 rounded-lg"
         style={{
           backgroundColor: "var(--light-blue)",
           color: "var(--secondary-dark)",
@@ -243,10 +243,10 @@ const ScreebAi = () => {
       ) : (
         <>
           {/* Contenitore con altezza fissa per evitare spostamenti nel layout */}
-          <div className="mb-6 flex flex-col" style={{ minHeight: "150px" }}>
+          <div className="mb-2 flex flex-col" style={{ minHeight: "100px" }}>
             {/* Word to draw o risultato AI */}
             <div
-              className="text-center p-4 rounded-lg flex-grow flex flex-col justify-center"
+              className="text-center p-2 rounded-lg flex-grow flex flex-col justify-center"
               style={{
                 backgroundColor: "var(--light-blue)",
               }}
@@ -316,7 +316,7 @@ const ScreebAi = () => {
           </div>
 
           {/* Drawing canvas */}
-          <div className="flex-grow pb-16 md:pb-0">
+          <div className="flex-grow pb-12 md:pb-0">
             <ScreebaiCanvas onSubmit={handleSubmit} />
           </div>
         </>

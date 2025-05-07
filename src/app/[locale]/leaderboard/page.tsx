@@ -3,9 +3,16 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Leaderboard from "@/components/Leaderboard";
+import Leaderboard from "@/components/leaderboard/Leaderboard";
+import { Locale } from "@/i18n/settings";
+import { use } from "react";
 
-export default function LeaderboardPage() {
+export default function LeaderboardPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = use(params);
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -32,9 +39,8 @@ export default function LeaderboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-4 h-full flex flex-col">
-      <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--secondary)" }}></h1>
       <div className="flex-grow overflow-hidden">
-        <Leaderboard />
+        <Leaderboard locale={locale} />
       </div>
     </div>
   );

@@ -1,0 +1,61 @@
+{
+  "common": {
+    "appName": "Screebai",
+    "appDescription": "App di Disegno",
+    "login": "Accedi",
+    "logout": "Esci",
+    "register": "Registrati",
+    "leaderboard": "Classifica",
+    "games": "Giochi",
+    "profile": "Profilo"
+  },
+  "navbar": {
+    "points": "Punti",
+    "logout": "Esci",
+    "login": "Accedi",
+    "leaderboard": "Classifica",
+    "games": "Giochi",
+    "email": "Email",
+    "password": "Password",
+    "needAccount": "Se non hai ancora un account,",
+    "alreadyAccount": "Hai già un account?",
+    "registerCTA": "registrati!",
+    "loginCTA": "accedi!"
+  },
+  "login": {
+    "title": "Accedi",
+    "email": "Email",
+    "password": "Password",
+    "login": "Accedi",
+    "register": "Registrati",
+    "forgotPassword": "Hai dimenticato la password?",
+    "loading": "Caricamento...",
+    "error": {
+      "generic": "Si è verificato un errore",
+      "emailExists": "Esiste già un account con questa email"
+    }
+  },
+  "home": {
+    "hello": "Ciao",
+    "welcome1": "Benvenuto in CoGames. Attualmente hai",
+    "welcome2": "in classifica",
+    "points": "punti"
+  },
+  "games": {
+    "title": "Giochi",
+    "play": "Gioca",
+    "game1": {
+      "title": "ScreebAI",
+      "description": "Disegna la parola indicata e fai indovinare all'AI cosa hai disegnato."
+    }
+  },
+  "leaderboard": {
+    "yourPosition": "La tua posizione",
+    "refresh": "Aggiorna",
+    "noData": "Nessun dato disponibile"
+  },
+  "errors": {
+    "nicknameVerification": "Errore durante la verifica del nickname",
+    "scoreCreation": "Errore durante la creazione del record di punteggio"
+  }
+}

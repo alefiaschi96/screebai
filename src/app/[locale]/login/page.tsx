@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { generateNickname } from "@/data/nicknames";
 import { useRouter } from "next/navigation";
+import { Locale } from "@/i18n/settings";
+import { useTranslation } from "@/hooks/useTranslation";
 
-export default function LoginPage() {
+export default function LoginPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = use(params);
+  const { t } = useTranslation(locale);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -28,7 +36,7 @@ export default function LoginPage() {
         .maybeSingle();
 
       if (error) {
-        console.error("Errore durante la verifica del nickname:", error);
+        console.error(t("errors.nicknameVerification") + ":", error);
         continue;
       }
 
@@ -72,7 +80,7 @@ export default function LoginPage() {
 
         // Show success message or redirect
         if (data.user?.identities?.length === 0) {
-          setError("An account with this email already exists.");
+          setError(t("login.error.emailExists"));
         } else {
           // Crea un nuovo record nella tabella scores
           if (data.user) {
@@ -86,7 +94,7 @@ export default function LoginPage() {
 
             if (scoreError) {
               console.error(
-                "Errore durante la creazione del record di punteggio:",
+                t("errors.scoreCreation") + ":",
                 scoreError
               );
             }
@@ -97,7 +105,7 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err: Error | unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("login.error.generic"));
     } finally {
       setLoading(false);
     }
@@ -108,7 +116,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isLogin ? "Sign in to your account" : "Create a new account"}
+            {isLogin ? t("login.title") : t("login.register")}
           </h2>
         </div>
 
@@ -126,7 +134,7 @@ export default function LoginPage() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email-address" className="sr-only">
-                Email address
+                {t("login.email")}
               </label>
               <input
                 id="email-address"
@@ -137,7 +145,7 @@ export default function LoginPage() {
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 ${
                   isLogin ? "rounded-t-md" : ""
                 } focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
-                placeholder="Email address"
+                placeholder={t("login.email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -145,7 +153,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                {t("login.password")}
               </label>
               <input
                 id="password"
@@ -154,7 +162,7 @@ export default function LoginPage() {
                 autoComplete={isLogin ? "current-password" : "new-password"}
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder={t("login.password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -167,20 +175,38 @@ export default function LoginPage() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? "Processing..." : isLogin ? "Sign in" : "Sign up"}
+              {loading
+                ? t("login.loading")
+                : isLogin
+                ? t("login.login")
+                : t("login.register")}
             </button>
           </div>
 
-          <div className="text-sm text-center">
-            <button
-              type="button"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin
-                ? "Need an account? Sign up"
-                : "Already have an account? Sign in"}
-            </button>
+          <div className="text-sm text-center text-gray-600">
+            {isLogin ? (
+              <p>
+                {t("navbar.needAccount")}
+                <button
+                  type="button"
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  onClick={() => setIsLogin(false)}
+                >
+                  {t("navbar.registerCTA")}
+                </button>
+              </p>
+            ) : (
+              <p>
+                {t("navbar.alreadyAccount")}
+                <button
+                  type="button"
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  onClick={() => setIsLogin(true)}
+                >
+                  {t("navbar.loginCTA")}
+                </button>
+              </p>
+            )}
           </div>
         </form>
       </div>

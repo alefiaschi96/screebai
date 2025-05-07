@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Locale } from "@/i18n/settings";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type LeaderboardEntry = {
   id: number;
@@ -12,7 +14,7 @@ type LeaderboardEntry = {
   position?: number; // Posizione reale nella classifica
 };
 
-export default function Leaderboard() {
+export default function Leaderboard({ locale }: { locale: Locale }) {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
     []
   );
@@ -22,6 +24,7 @@ export default function Leaderboard() {
   const [, setHasMore] = useState(true);
   const { userScore } = useAuth();
   const [, setAllScoresData] = useState<{ id: number; position: number }[]>([]);
+  const { t } = useTranslation(locale);
 
   const itemsPerPage = 10;
 
@@ -116,7 +119,14 @@ export default function Leaderboard() {
         const minEndIndex = Math.max(4, userIndex + 1); // Almeno fino alla posizione 5
         const endIndex = Math.min(allScores.length - 1, minEndIndex);
 
-        console.log("startIndex", startIndex, "minEndIndex", minEndIndex, "endIndex", endIndex);
+        console.log(
+          "startIndex",
+          startIndex,
+          "minEndIndex",
+          minEndIndex,
+          "endIndex",
+          endIndex
+        );
 
         // Ottieni i dati completi per questo intervallo
         const { data: nearUserData, error: nearUserError } = await supabase
@@ -168,36 +178,11 @@ export default function Leaderboard() {
     fetchLeaderboard();
   }, [userScore]); // Ricarica quando cambia l'utente
 
-  // Funzione per ricaricare la classifica
-  const refreshLeaderboard = () => {
-    fetchLeaderboard();
-  };
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-bold">Classifica</h2>
-        <button
-          onClick={refreshLeaderboard}
-          className="text-sm font-medium flex items-center rounded-full px-3 py-1"
-          style={{ backgroundColor: "var(--secondary)", color: "white" }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          Aggiorna
-        </button>
+        <h2 className="text-xl font-bold">{t('common.leaderboard')}</h2>
       </div>
 
       {error && (
@@ -235,29 +220,33 @@ export default function Leaderboard() {
                   }
                   ${isTopTwo ? "border-primary" : ""}`}
                 style={{
-                  backgroundColor: userScore?.user_id === entry.user_id ? "rgba(44, 87, 112, 0.1)" : "white",
+                  backgroundColor:
+                    userScore?.user_id === entry.user_id
+                      ? "rgba(44, 87, 112, 0.1)"
+                      : "white",
                 }}
               >
                 <div
                   className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mr-2`}
-                  style={{ 
-                    backgroundColor: isTopTwo ? "var(--primary)" : "var(--secondary)",
-                    color: "white"
+                  style={{
+                    backgroundColor: isTopTwo
+                      ? "var(--primary)"
+                      : "var(--secondary)",
+                    color: "white",
                   }}
                 >
-                  <span className="font-bold text-sm">
-                    {position}
-                  </span>
+                  <span className="font-bold text-sm">{position}</span>
                 </div>
                 <div className="flex-grow truncate">
                   <div
                     className="font-medium text-sm truncate"
                     style={{
-                      color: userScore?.user_id === entry.user_id 
-                        ? "var(--primary-dark)" 
-                        : isTopTwo 
-                        ? "var(--secondary-dark)" 
-                        : "var(--secondary-dark)"
+                      color:
+                        userScore?.user_id === entry.user_id
+                          ? "var(--primary-dark)"
+                          : isTopTwo
+                          ? "var(--secondary-dark)"
+                          : "var(--secondary-dark)",
                     }}
                   >
                     {entry.user_nick}
@@ -266,14 +255,14 @@ export default function Leaderboard() {
                 </div>
                 <div
                   className="flex-shrink-0 px-2 py-1 rounded-full"
-                  style={{ 
-                    backgroundColor: isTopTwo ? "var(--primary)" : "var(--secondary)",
-                    color: "white"
+                  style={{
+                    backgroundColor: isTopTwo
+                      ? "var(--primary)"
+                      : "var(--secondary)",
+                    color: "white",
                   }}
                 >
-                  <span className="font-medium text-sm">
-                    {entry.score}
-                  </span>
+                  <span className="font-medium text-sm">{entry.score}</span>
                 </div>
               </div>
 
@@ -281,11 +270,20 @@ export default function Leaderboard() {
               {showSeparator && (
                 <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t" style={{ borderColor: "var(--light-blue)" }}></div>
+                    <div
+                      className="w-full border-t"
+                      style={{ borderColor: "var(--light-blue)" }}
+                    ></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-2 text-xs font-medium rounded-full py-1" style={{ backgroundColor: "var(--secondary)", color: "white" }}>
-                      La tua posizione
+                    <span
+                      className="px-2 text-xs font-medium rounded-full py-1"
+                      style={{
+                        backgroundColor: "var(--secondary)",
+                        color: "white",
+                      }}
+                    >
+                      {t('leaderboard.yourPosition')}
                     </span>
                   </div>
                 </div>
@@ -305,7 +303,7 @@ export default function Leaderboard() {
 
       {!loading && leaderboardData.length === 0 && !error && (
         <div className="text-center py-4 text-gray-500">
-          Nessun dato disponibile nella classifica
+          {t('leaderboard.noData')}
         </div>
       )}
     </div>
