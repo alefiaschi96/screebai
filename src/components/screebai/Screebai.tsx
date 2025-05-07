@@ -195,25 +195,25 @@ const ScreebAi = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full p-2 md:p-6">
+    <div className="flex flex-col h-full w-full p-1 sm:p-2 md:p-6">
       {/* Game stats */}
       <div
-        className="flex justify-between items-center mb-2 p-2 rounded-lg"
+        className="flex justify-between items-center mb-1 sm:mb-2 p-1 sm:p-2 rounded-lg text-xs sm:text-sm"
         style={{
           backgroundColor: "var(--light-blue)",
           color: "var(--secondary-dark)",
         }}
       >
-        <div className="text-sm font-semibold">
+        <div className="font-semibold">
           Tentativo: {attempts}/{MAX_ATTEMPTS}
         </div>
-        <div className="text-sm font-semibold">
+        <div className="font-semibold">
           Tempo:{" "}
           <span className={`${timeLeft <= 10 ? "text-danger" : ""}`}>
             {timeLeft}s
           </span>
         </div>
-        <div className="text-sm font-semibold">Punti: {score}</div>
+        <div className="font-semibold">Punti: {score}</div>
       </div>
 
       {/* Game over screen */}
@@ -243,10 +243,10 @@ const ScreebAi = () => {
       ) : (
         <>
           {/* Contenitore con altezza fissa per evitare spostamenti nel layout */}
-          <div className="mb-2 flex flex-col" style={{ minHeight: "100px" }}>
+          <div className="mb-1 sm:mb-2 flex flex-col" style={{ minHeight: "80px", maxHeight: "100px" }}>
             {/* Word to draw o risultato AI */}
             <div
-              className="text-center p-2 rounded-lg flex-grow flex flex-col justify-center"
+              className="text-center p-1 sm:p-2 rounded-lg flex-grow flex flex-col justify-center"
               style={{
                 backgroundColor: "var(--light-blue)",
               }}
@@ -255,7 +255,7 @@ const ScreebAi = () => {
                 /* Parola da disegnare */
                 <div className="flex flex-col items-center justify-center h-full">
                   <p
-                    className="text-3xl font-bold"
+                    className="text-2xl sm:text-3xl font-bold"
                     style={{ color: "var(--primary-dark)" }}
                   >
                     {word}
@@ -265,14 +265,14 @@ const ScreebAi = () => {
                 /* Risultato dell'AI */
                 <div className="flex flex-col items-center justify-center h-full">
                   <h3
-                    className="text-xl font-bold mb-2"
+                    className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                     style={{ color: "var(--primary-dark)" }}
                   >
                     L&apos;AI ha riconosciuto:
                   </h3>
                   {isAnalyzing ? (
                     <p
-                      className="text-xl"
+                      className="text-lg sm:text-xl"
                       style={{ color: "var(--primary-dark)" }}
                     >
                       Analisi in corso...
@@ -280,7 +280,7 @@ const ScreebAi = () => {
                   ) : (
                     <>
                       <p
-                        className="text-3xl font-bold mb-3"
+                        className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-3"
                         style={{ color: "var(--primary-dark)" }}
                       >
                         {aiResult || "Non riconosciuto"}
@@ -316,7 +316,7 @@ const ScreebAi = () => {
           </div>
 
           {/* Drawing canvas */}
-          <div className="flex-grow pb-12 md:pb-0">
+          <div className="flex-grow pb-10 sm:pb-12 md:pb-0">
             <ScreebaiCanvas onSubmit={handleSubmit} />
           </div>
         </>

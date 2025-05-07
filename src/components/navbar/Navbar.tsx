@@ -28,13 +28,13 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-12 sm:h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <span
-                  className="text-2xl font-bold"
+                  className="text-xl sm:text-2xl font-bold"
                   style={{ color: "var(--secondary)" }}
                 >
                   <span style={{ color: "var(--primary)" }}>Co</span>games
@@ -89,7 +89,8 @@ export default function Navbar() {
             {!isLoading && user && (
               <Link
                 href="/leaderboard"
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{ color: "var(--primary)" }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +163,9 @@ export default function Navbar() {
           <div className="flex flex-col h-full">
             {/* Menu header with close button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <div className="font-bold text-xl text-indigo-600">CoGames</div>
+              <div className="font-bold text-xl">
+                <span style={{ color: "var(--primary)" }}>Co</span><span style={{ color: "var(--secondary)" }}>Games</span>
+              </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
@@ -191,11 +194,11 @@ export default function Navbar() {
                   {user && userScore ? (
                     <div className="space-y-6">
                       {/* User info */}
-                      <div className="bg-indigo-50 rounded-lg p-4 text-center">
-                        <div className="text-lg font-bold text-indigo-700 mb-1">
+                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: "rgba(var(--primary-rgb), 0.1)" }}>
+                        <div className="text-lg font-bold mb-1" style={{ color: "var(--primary)" }}>
                           {userScore.user_nick || user.email}
                         </div>
-                        <div className="text-indigo-600">
+                        <div style={{ color: "var(--secondary)" }}>
                           {t("navbar.points")}{" "}
                           <span className="font-bold">{userScore.score}</span>
                         </div>
@@ -254,7 +257,8 @@ export default function Navbar() {
                           signOut();
                           setIsMenuOpen(false);
                         }}
-                        className="w-full p-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                        className="w-full p-3 text-white rounded-lg font-medium transition-colors hover:opacity-90"
+                        style={{ backgroundColor: "var(--primary)" }}
                       >
                         {t("navbar.logout")}
                       </button>
@@ -263,7 +267,8 @@ export default function Navbar() {
                     <div className="flex justify-center">
                       <Link
                         href="/login"
-                        className="p-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                        className="p-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors"
+                        style={{ backgroundColor: "var(--primary)" }}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {t("navbar.login")}

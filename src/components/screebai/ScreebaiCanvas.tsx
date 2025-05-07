@@ -35,11 +35,15 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
           const viewportHeight = window.innerHeight;
           const containerRect = container.getBoundingClientRect();
           const containerTop = containerRect.top;
-          const toolbarHeight = 40; // Altezza stimata della barra degli strumenti
+          
+          // Calcola l'altezza della barra degli strumenti in base alla dimensione dello schermo
+          const isMobile = window.innerWidth < 640;
+          const toolbarHeight = isMobile ? 36 : 40; // Altezza ridotta su mobile
+          const safetyMargin = isMobile ? 8 : 16; // Margine di sicurezza aggiuntivo su mobile
           
           // Calcola l'altezza massima disponibile per il canvas
-          // Sottraiamo la posizione top del container e l'altezza della toolbar
-          const availableHeight = viewportHeight - containerTop - toolbarHeight;
+          // Sottraiamo la posizione top del container, l'altezza della toolbar e un margine di sicurezza
+          const availableHeight = viewportHeight - containerTop - toolbarHeight - safetyMargin;
           
           // Usa l'altezza disponibile o l'altezza del container, quella che è minore
           const height = Math.min(availableHeight, containerRect.height);
@@ -51,11 +55,9 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
           canvasRef.current.width = width;
           canvasRef.current.height = height;
           
-          // Initialize canvas with white background
-          const ctx = canvasRef.current.getContext('2d');
-          if (ctx) {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, width, height);
+          // Applica uno stile di bordo più sottile su mobile
+          if (isMobile) {
+            container.style.borderWidth = '1px';
           }
         }
       }
@@ -172,29 +174,33 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
       </div>
       
       {/* Tools */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 shadow-lg py-2 px-2 flex justify-between items-center gap-1 md:static md:bg-transparent md:shadow-none md:mt-2 md:px-0 md:py-0">
+      <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 shadow-lg py-1 px-2 flex justify-between items-center gap-1 md:static md:bg-transparent md:shadow-none md:mt-2 md:px-0 md:py-0">
         <div className="flex gap-1">
           <button
-            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'pen' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'pen' ? 'text-white' : 'bg-gray-200'}`}
+            style={currentTool === 'pen' ? { backgroundColor: 'var(--primary)' } : {}}
             onClick={() => setCurrentTool('pen')}
           >
             Penna
           </button>
           <button
-            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'eraser' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'eraser' ? 'text-white' : 'bg-gray-200'}`}
+            style={currentTool === 'eraser' ? { backgroundColor: 'var(--primary)' } : {}}
             onClick={() => setCurrentTool('eraser')}
           >
             Gomma
           </button>
           <button
-            className="px-2 py-1 bg-red-500 text-white rounded-md text-xs"
+            className="px-2 py-1 text-white rounded-md text-xs"
+            style={{ backgroundColor: 'var(--secondary)' }}
             onClick={clearCanvas}
           >
             Cancella tutto
           </button>
         </div>
         <button
-          className="px-3 py-1 bg-green-500 text-white rounded-md text-xs font-bold"
+          className="px-3 py-1 text-white rounded-md text-xs font-bold"
+          style={{ backgroundColor: 'var(--primary)' }}
           onClick={exportImage}
         >
           Finito
