@@ -1,309 +1,140 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Locale } from "@/i18n/settings";
 import { useTranslation } from "@/hooks/useTranslation";
 
-type LeaderboardEntry = {
+export type LeaderboardEntry = {
   id: number;
   user_id: string;
   user_nick: string;
   score: number;
-  position?: number; // Posizione reale nella classifica
+  position: number;
 };
 
 export default function Leaderboard({ locale }: { locale: Locale }) {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [, setHasMore] = useState(true);
-  const { userScore } = useAuth();
-  const [, setAllScoresData] = useState<{ id: number; position: number }[]>([]);
   const { t } = useTranslation(locale);
+  const { userScore } = useAuth();
 
-  const itemsPerPage = 10;
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Funzione per caricare i dati della classifica con i primi 2 e quelli vicini all'utente
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Prima ottieni tutti i punteggi ordinati per avere la classifica completa
-      const { data: allScores, error: rankError } = await supabase
+      const { data, error } = await supabase
         .from("scores")
-        .select("id, user_id, score")
+        .select("id, user_id, user_nick, score")
         .order("score", { ascending: false });
 
-      if (rankError) throw rankError;
+      if (error) throw error;
 
-      // Salva le posizioni di tutti i giocatori
-      const positionsMap = allScores.map((score, index) => ({
-        id: score.id,
+      const leaderboardData: LeaderboardEntry[] = data.map((entry, index) => ({
+        ...entry,
         position: index + 1,
       }));
-      setAllScoresData(positionsMap);
+
+      let displayedData;
 
       if (!userScore) {
-        // Se non c'è un utente loggato, carica solo i primi 5
-        const { data, error } = await supabase
-          .from("scores")
-          .select("*")
-          .order("score", { ascending: false })
-          .limit(5);
-
-        if (error) throw error;
-
-        // Aggiungi le posizioni reali
-        const dataWithPositions = (data as LeaderboardEntry[]).map((entry) => {
-          const posInfo = positionsMap.find((p) => p.id === entry.id);
-          return {
-            ...entry,
-            position: posInfo ? posInfo.position : 0,
-          };
-        });
-
-        setLeaderboardData(dataWithPositions);
-        setHasMore(false);
-        return;
-      }
-
-      // Trova l'indice dell'utente corrente
-      const userIndex = allScores.findIndex(
-        (score) => score.user_id === userScore.user_id
-      );
-
-      if (userIndex === -1) {
-        throw new Error("Utente non trovato nella classifica");
-      }
-
-      // Ottieni i primi 2 della classifica
-      const { data: topTwoData, error: topTwoError } = await supabase
-        .from("scores")
-        .select("*")
-        .order("score", { ascending: false })
-        .limit(2);
-
-      if (topTwoError) throw topTwoError;
-
-      // Se l'utente è tra i primi 2, mostra solo i primi 5
-      if (userIndex < 2) {
-        const { data: topFiveData, error: topFiveError } = await supabase
-          .from("scores")
-          .select("*")
-          .order("score", { ascending: false })
-          .limit(5);
-
-        if (topFiveError) throw topFiveError;
-
-        // Aggiungi le posizioni reali
-        const dataWithPositions = (topFiveData as LeaderboardEntry[]).map(
-          (entry) => {
-            const posInfo = positionsMap.find((p) => p.id === entry.id);
-            return {
-              ...entry,
-              position: posInfo ? posInfo.position : 0,
-            };
-          }
-        );
-
-        setLeaderboardData(dataWithPositions);
+        displayedData = leaderboardData.slice(0, 5);
       } else {
-        // Calcola l'intervallo di posizioni vicine all'utente
-        const startIndex = Math.max(2, userIndex - 1); // Inizia da 2 per escludere i primi 2
-        // Assicuriamoci di mostrare almeno 3 giocatori dopo i primi 2
-        const minEndIndex = Math.max(4, userIndex + 1); // Almeno fino alla posizione 5
-        const endIndex = Math.min(allScores.length - 1, minEndIndex);
+        const userPosition = leaderboardData.findIndex((e) => e.user_id === userScore.user_id);
 
-        console.log(
-          "startIndex",
-          startIndex,
-          "minEndIndex",
-          minEndIndex,
-          "endIndex",
-          endIndex
-        );
-
-        // Ottieni i dati completi per questo intervallo
-        const { data: nearUserData, error: nearUserError } = await supabase
-          .from("scores")
-          .select("*")
-          .order("score", { ascending: false })
-          .range(startIndex, endIndex);
-
-        if (nearUserError) throw nearUserError;
-
-        // Combina i primi 2 con quelli vicini all'utente
-        const combinedData = [
-          ...(topTwoData as LeaderboardEntry[]),
-          ...(nearUserData as LeaderboardEntry[]),
-        ];
-
-        // Rimuovi eventuali duplicati (nel caso l'utente sia tra i primi 2)
-        const uniqueData = combinedData.filter(
-          (entry, index, self) =>
-            index === self.findIndex((e) => e.id === entry.id)
-        );
-
-        // Aggiungi le posizioni reali
-        const dataWithPositions = uniqueData.map((entry) => {
-          const posInfo = positionsMap.find((p) => p.id === entry.id);
-          return {
-            ...entry,
-            position: posInfo ? posInfo.position : 0,
-          };
-        });
-
-        setLeaderboardData(dataWithPositions);
+        if (userPosition === -1 || userPosition < 2) {
+          displayedData = leaderboardData.slice(0, 5);
+        } else {
+          const start = Math.max(0, userPosition - 1);
+          const end = Math.min(leaderboardData.length, userPosition + 2);
+          displayedData = [
+            ...leaderboardData.slice(0, 2),
+            ...leaderboardData.slice(start, end),
+          ];
+          displayedData = Array.from(new Set(displayedData));
+        }
       }
 
-      // Non c'è più bisogno di caricare altre pagine
-      setHasMore(false);
-      // Salva la posizione iniziale per mostrare il numero corretto
-      setPage(0);
+      setLeaderboard(displayedData);
     } catch (err) {
-      setError("Errore nel caricamento della classifica");
       console.error("Error fetching leaderboard:", err);
+      setError(t("leaderboard.fetchError"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [userScore, t]);
 
-  // Carica la classifica all'avvio
   useEffect(() => {
     fetchLeaderboard();
-  }, [userScore]); // Ricarica quando cambia l'utente
-
+  }, [fetchLeaderboard]);
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-bold">{t('common.leaderboard')}</h2>
+      <div className="flex items-center mb-4">
+        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b]">
+          {t("common.leaderboard")}
+        </span>
       </div>
 
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="bg-red-900 bg-opacity-20 border-l-4 border-red-600 p-4 mb-4 rounded">
+          <p className="text-sm text-red-400">{error}</p>
         </div>
       )}
 
-      {/* Layout a card per tutti i dispositivi */}
-      <div className="space-y-2 overflow-y-auto flex-grow pb-2">
-        {leaderboardData.map((entry, index) => {
-          // Usa la posizione reale salvata nell'entry
-          const position = entry.position || index + 1;
-
-          // Determina se questa entry è uno dei primi 2 giocatori
-          const isTopTwo = position <= 2;
-
-          // Determina se dobbiamo mostrare un separatore dopo questa entry
-          // (mostra il separatore dopo il secondo giocatore, ma solo se ci sono altri giocatori dopo)
-          const showSeparator =
-            position === 2 &&
-            leaderboardData.length > 2 &&
-            // Verifica che il prossimo giocatore non sia in posizione 3
-            // (questo accade quando l'utente è in posizione 3 o vicino)
-            Math.floor(page * itemsPerPage) + (index + 1) + 1 > 3;
-
-          return (
-            <React.Fragment key={entry.id}>
-              <div
-                className={`rounded-lg border p-2 flex items-center 
-                  ${
-                    userScore?.user_id === entry.user_id
-                      ? "border-primary"
-                      : "border-gray-200"
-                  }
-                  ${isTopTwo ? "border-primary" : ""}`}
-                style={{
-                  backgroundColor:
-                    userScore?.user_id === entry.user_id
-                      ? "rgba(44, 87, 112, 0.1)"
-                      : "white",
-                }}
-              >
-                <div
-                  className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mr-2`}
-                  style={{
-                    backgroundColor: isTopTwo
-                      ? "var(--primary)"
-                      : "var(--secondary)",
-                    color: "white",
-                  }}
-                >
-                  <span className="font-bold text-sm">{position}</span>
-                </div>
-                <div className="flex-grow truncate">
-                  <div
-                    className="font-medium text-sm truncate"
-                    style={{
-                      color:
-                        userScore?.user_id === entry.user_id
-                          ? "var(--primary-dark)"
-                          : isTopTwo
-                          ? "var(--secondary-dark)"
-                          : "var(--secondary-dark)",
-                    }}
-                  >
-                    {entry.user_nick}
-                    {userScore?.user_id === entry.user_id && " (Tu)"}
-                  </div>
-                </div>
-                <div
-                  className="flex-shrink-0 px-2 py-1 rounded-full"
-                  style={{
-                    backgroundColor: isTopTwo
-                      ? "var(--primary)"
-                      : "var(--secondary)",
-                    color: "white",
-                  }}
-                >
-                  <span className="font-medium text-sm">{entry.score}</span>
-                </div>
-              </div>
-
-              {/* Separatore tra i top 2 e gli altri */}
-              {showSeparator && (
-                <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center">
-                    <div
-                      className="w-full border-t"
-                      style={{ borderColor: "var(--light-blue)" }}
-                    ></div>
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span
-                      className="px-2 text-xs font-medium rounded-full py-1"
-                      style={{
-                        backgroundColor: "var(--secondary)",
-                        color: "white",
-                      }}
-                    >
-                      {t('leaderboard.yourPosition')}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
+      <div className="space-y-2 overflow-y-auto flex-grow pb-2 px-1">
+        {leaderboard.map((entry) => (
+          <div
+            key={entry.id}
+            className="rounded-2xl py-2.5 px-4 flex items-center"
+            style={{
+              background:
+                userScore?.user_id === entry.user_id
+                  ? "linear-gradient(90deg, rgba(131, 90, 207, 0.2) 0%, rgba(140, 121, 235, 0.1) 100%)"
+                  : "#2a3852",
+            }}
+          >
+            <div
+              className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3"
+              style={{
+                background:
+                  entry.position === 1
+                    ? "#f59e0b"
+                    : entry.position === 2
+                    ? "#94a3b8"
+                    : entry.position === 3
+                    ? "#b45309"
+                    : userScore?.user_id === entry.user_id
+                    ? "rgba(195, 182, 70, 0.53)"
+                    : "#334155",
+                color: "white",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+              }}
+            >
+              <span className="font-bold text-sm">{entry.position}</span>
+            </div>
+            <div className="flex-grow truncate text-white font-medium text-base">
+              {entry.user_nick}
+              {userScore?.user_id === entry.user_id && " (Tu)"}
+            </div>
+            <div className="flex-shrink-0 font-bold text-xl" style={{ color: "#64748b" }}>
+              {entry.score}
+            </div>
+          </div>
+        ))}
       </div>
 
       {loading && (
         <div className="flex justify-center my-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#6366f1]"></div>
         </div>
       )}
 
-      {/* Non mostriamo più il pulsante 'Carica altri' poiché ora mostriamo solo un intervallo specifico */}
-
-      {!loading && leaderboardData.length === 0 && !error && (
-        <div className="text-center py-4 text-gray-500">
-          {t('leaderboard.noData')}
+      {!loading && leaderboard.length === 0 && !error && (
+        <div className="text-center py-4 text-gray-400">
+          {t("leaderboard.noData")}
         </div>
       )}
     </div>

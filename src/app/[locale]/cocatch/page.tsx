@@ -3,17 +3,10 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Leaderboard from "@/components/leaderboard/Leaderboard";
-import { Locale } from "@/i18n/settings";
-import { use } from "react";
+import CoCatch from "@/components/cocatch/CoCatch";
 
-export default function LeaderboardPage({
-  params,
-}: {
-  params: Promise<{ locale: Locale }>;
-}) {
-  const { locale } = use(params);
-  const { isAuthenticated, isLoading } = useAuth();
+export default function Cocatch() {
+  const { user, userScore, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   // Redirect to login if not authenticated
@@ -32,16 +25,18 @@ export default function LeaderboardPage({
     );
   }
 
-  // Show page only if authenticated
-  if (!isAuthenticated) {
-    return null; // Will redirect to login via useEffect
+  // Show games page only if authenticated
+  if (!isAuthenticated || !user || !userScore) {
+    return (
+      <div className="flex items-center justify-center h-full bg-[#0f172a]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6366f1]"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 h-full flex flex-col bg-[#0f172a]">
-      <div className="flex-grow overflow-hidden rounded-lg">
-        <Leaderboard locale={locale} />
-      </div>
+    <div className="flex flex-col flex-grow w-full h-full bg-[#0f172a]">
+      <CoCatch />
     </div>
   );
 }

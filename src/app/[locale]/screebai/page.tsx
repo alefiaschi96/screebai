@@ -19,8 +19,8 @@ export default function Screebai() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center h-full bg-[#0f172a]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6366f1]"></div>
       </div>
     );
   }
@@ -28,11 +28,15 @@ export default function Screebai() {
   // Show games page only if authenticated
   if (!isAuthenticated || !user || !userScore) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center h-full bg-[#0f172a]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6366f1]"></div>
       </div>
     );
   }
 
-  return <ScreebAi />;
+  return (
+    <div className="flex flex-col flex-grow w-full h-full bg-[#0f172a]">
+      <ScreebAi />
+    </div>
+  );
 }

@@ -46,16 +46,48 @@
     "play": "Play",
     "game1": {
       "title": "ScreebAI",
-      "description": "Draw the word indicated and let the AI guess what you drew."
+      "description": "Let the AI guess what you drew."
+    },
+    "game2": {
+      "title": "CoCatch",
+      "description": "Catch the Codeployer"
     }
   },
   "leaderboard": {
-    "yourPosition": "Your Position",
+    "yourPosition": "Your position",
     "refresh": "Refresh",
     "noData": "No data available"
   },
+  "screebai": {
+    "wordToDraw": "Word to draw",
+    "aiRecognized": "AI recognized:",
+    "analyzing": "Analyzing...",
+    "notRecognized": "Not recognized",
+    "correct": "Correct! +{{points}} point",
+    "notMatching": "Does not match",
+    "playAgain": "Play again",
+    "submit": "Submit",
+    "erase": "Eraser",
+    "eraseAll": "Clear all",
+    "attempts": "Attempt:",
+    "time": "Time:",
+    "points": "Points:",
+    "gameOver": "Game Over",
+    "finalScore": "Final score",
+    "seconds": "s"
+  },
+  "cocatch": {
+    "startGame": "Start game",
+    "timeLeft": "Time left:",
+    "score": "Score:",
+    "gameOver": "Game over!",
+    "finalScore": "Final score",
+    "playAgain": "Play again",
+    "catchImages": "Catch the images!",
+    "instructions": "Click on the images before they disappear"
+  },
   "errors": {
-    "nicknameVerification": "Error while verifying nickname",
-    "scoreCreation": "Error while creating score record"
+    "nicknameVerification": "Error verifying nickname",
+    "scoreCreation": "Error creating score record"
   }
 }

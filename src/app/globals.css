@@ -1,16 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #2c5770; /* Blu scuro Codeploy */
-  --primary: #f39c12; /* Arancione Codeploy */
-  --primary-dark: #e67e22; /* Arancione scuro Codeploy */
-  --secondary: #2c5770; /* Blu Codeploy */
-  --secondary-dark: #1c3d4e; /* Blu scuro Codeploy */
-  --success: #27ae60;
-  --danger: #e74c3c;
-  --light-blue: #7fb9d2; /* Azzurro chiaro Codeploy */
-  --yellow: #f1c40f; /* Giallo Codeploy */
+  /* Colori principali del tema scuro */
+  --background: #0f172a; /* Sfondo principale molto scuro (navy) */
+  --foreground: #e2e8f0; /* Testo principale chiaro */
+  --primary: #6366f1; /* Indigo/viola per elementi primari */
+  --primary-rgb: 99, 102, 241; /* Versione RGB del colore primario */
+  --primary-dark: #4f46e5; /* Versione più scura del colore primario */
+  --secondary: #f59e0b; /* Arancione/oro per accenti */
+  --secondary-dark: #d97706; /* Versione più scura dell'arancione */
+  --card-bg: #1e293b; /* Sfondo delle card leggermente più chiaro */
+  --card-border: #334155; /* Bordo delle card */
+  --success: #10b981; /* Verde per successo */
+  --danger: #ef4444; /* Rosso per errori */
+  --light-blue: #3b82f6; /* Azzurro per elementi interattivi */
+  --yellow: #f59e0b; /* Giallo/oro per badge e accenti */
+  --text-muted: #94a3b8; /* Testo secondario/disabilitato */
 }
 
 @theme inline {
@@ -20,25 +25,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1c3d4e; /* Blu scuro Codeploy */
-    --foreground: #ffffff;
-    --primary: #f39c12; /* Arancione Codeploy */
-    --primary-dark: #e67e22; /* Arancione scuro Codeploy */
-    --secondary: #7fb9d2; /* Azzurro chiaro Codeploy */
-    --secondary-dark: #2c5770; /* Blu Codeploy */
-    --success: #27ae60;
-    --danger: #e74c3c;
-    --light-blue: #7fb9d2; /* Azzurro chiaro Codeploy */
-    --yellow: #f1c40f; /* Giallo Codeploy */
-  }
-}
+/* Non usiamo più media query per il tema scuro, è sempre scuro */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Montserrat', sans-serif; /* Font simile a quello di Codeploy */
+  font-family: 'Inter', 'Montserrat', sans-serif; /* Font moderno */
   overscroll-behavior: none; /* Prevent bounce effect on mobile */
   touch-action: manipulation; /* Optimize for touch */
   -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */

@@ -46,13 +46,45 @@
     "play": "Gioca",
     "game1": {
       "title": "ScreebAI",
-      "description": "Disegna la parola indicata e fai indovinare all'AI cosa hai disegnato."
+      "description": "Fai indovinare all'AI cosa hai disegnato."
+    },
+    "game2": {
+      "title": "CoCatch",
+      "description": "Acchiappa il Codeployer"
     }
   },
   "leaderboard": {
     "yourPosition": "La tua posizione",
     "refresh": "Aggiorna",
     "noData": "Nessun dato disponibile"
+  },
+  "screebai": {
+    "wordToDraw": "Parola da disegnare",
+    "aiRecognized": "L'AI ha riconosciuto:",
+    "analyzing": "Analisi in corso...",
+    "notRecognized": "Non riconosciuto",
+    "correct": "Corretto! +{{points}} punti",
+    "notMatching": "Non corrisponde a",
+    "playAgain": "Gioca ancora",
+    "submit": "Invia",
+    "erase": "Gomma",
+    "eraseAll": "Cancella tutto",
+    "attempts": "Tentativo:",
+    "time": "Tempo:",
+    "points": "Punti:",
+    "gameOver": "Game Over",
+    "finalScore": "Punteggio finale",
+    "seconds": "s"
+  },
+  "cocatch": {
+    "startGame": "Inizia partita",
+    "timeLeft": "Tempo rimasto:",
+    "score": "Punteggio:",
+    "gameOver": "Partita terminata!",
+    "finalScore": "Punteggio finale",
+    "playAgain": "Gioca ancora",
+    "catchImages": "Acchiappa le immagini!",
+    "instructions": "Clicca sulle immagini prima che scompaiano"
   },
   "errors": {
     "nicknameVerification": "Errore durante la verifica del nickname",

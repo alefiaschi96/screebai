@@ -27,17 +27,16 @@ export default function Navbar() {
   const { t } = useTranslation(locale);
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-12 sm:h-16">
+    <nav className="bg-[#0f172a] border-b border-[#334155]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-14 sm:h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <span
-                  className="text-xl sm:text-2xl font-bold"
-                  style={{ color: "var(--secondary)" }}
+                  className="text-xl sm:text-2xl font-bold text-[#f59e0b]"
                 >
-                  <span style={{ color: "var(--primary)" }}>Co</span>games
+                  <span className="text-[#6366f1]">Co</span>games
                 </span>
               </Link>
             </div>
@@ -47,11 +46,11 @@ export default function Navbar() {
               <>
                 {user && userScore ? (
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-500 font-bold">
+                    <span className="text-sm text-white font-bold">
                       {userScore.user_nick || user.email}
                     </span>
-                    <span className="text-sm text-gray-500 font-bold">
-                      {t("navbar.points")}: {userScore.score}
+                    <span className="text-sm text-[#94a3b8] font-bold">
+                      {t("navbar.points")}: <span className="text-[#f59e0b]">{userScore.score}</span>
                     </span>
                     {/* Language Switcher */}
                     <div className="mr-4">
@@ -60,7 +59,7 @@ export default function Navbar() {
                     <button
                       onClick={signOut}
                       className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
-                      style={{ backgroundColor: "var(--primary)" }}
+                      style={{ backgroundColor: "#6366f1" }}
                     >
                       {t("navbar.logout")}
                     </button>
@@ -74,7 +73,7 @@ export default function Navbar() {
                     <Link
                       href="/login"
                       className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
-                      style={{ backgroundColor: "var(--primary)" }}
+                      style={{ backgroundColor: "#6366f1" }}
                     >
                       {t("navbar.login")}
                     </Link>
@@ -89,8 +88,8 @@ export default function Navbar() {
             {!isLoading && user && (
               <Link
                 href="/leaderboard"
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                style={{ color: "var(--primary)" }}
+                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+                style={{ color: "#6366f1" }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +112,7 @@ export default function Navbar() {
             {/* Menu button */}
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#6366f1]"
               aria-expanded={isMenuOpen ? "true" : "false"}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -159,16 +158,16 @@ export default function Navbar() {
 
       {/* Mobile menu, show/hide based on menu state */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 sm:hidden bg-white">
+        <div className="fixed inset-0 z-50 sm:hidden bg-[#0f172a]">
           <div className="flex flex-col h-full">
             {/* Menu header with close button */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#334155]">
               <div className="font-bold text-xl">
-                <span style={{ color: "var(--primary)" }}>Co</span><span style={{ color: "var(--secondary)" }}>Games</span>
+                <span className="text-[#6366f1]">Co</span><span className="text-[#f59e0b]">games</span>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-[#1e293b]"
               >
                 <svg
                   className="h-6 w-6"
@@ -194,13 +193,13 @@ export default function Navbar() {
                   {user && userScore ? (
                     <div className="space-y-6">
                       {/* User info */}
-                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: "rgba(var(--primary-rgb), 0.1)" }}>
-                        <div className="text-lg font-bold mb-1" style={{ color: "var(--primary)" }}>
+                      <div className="bg-[#1e293b] rounded-lg p-4 text-center border border-[#334155]">
+                        <div className="text-lg font-bold mb-1 text-white">
                           {userScore.user_nick || user.email}
                         </div>
-                        <div style={{ color: "var(--secondary)" }}>
+                        <div className="text-[#94a3b8]">
                           {t("navbar.points")}{" "}
-                          <span className="font-bold">{userScore.score}</span>
+                          <span className="font-bold text-[#f59e0b]">{userScore.score}</span>
                         </div>
                       </div>
 
@@ -208,10 +207,10 @@ export default function Navbar() {
                       <div className="space-y-3">
                         <Link
                           href="/"
-                          className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
+                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748]"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <span className="text-gray-800 font-medium">
+                          <span className="text-white font-medium">
                             {t("navbar.games")}
                           </span>
                           <svg
@@ -230,10 +229,10 @@ export default function Navbar() {
 
                         <Link
                           href="/leaderboard"
-                          className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
+                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748]"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <span className="text-gray-800 font-medium">
+                          <span className="text-white font-medium">
                             {t("navbar.leaderboard")}
                           </span>
                           <svg
@@ -257,8 +256,8 @@ export default function Navbar() {
                           signOut();
                           setIsMenuOpen(false);
                         }}
-                        className="w-full p-3 text-white rounded-lg font-medium transition-colors hover:opacity-90"
-                        style={{ backgroundColor: "var(--primary)" }}
+                        className="w-full p-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors"
+                        style={{ backgroundColor: "#6366f1" }}
                       >
                         {t("navbar.logout")}
                       </button>
@@ -268,7 +267,7 @@ export default function Navbar() {
                       <Link
                         href="/login"
                         className="p-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors"
-                        style={{ backgroundColor: "var(--primary)" }}
+                        style={{ backgroundColor: "#6366f1" }}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {t("navbar.login")}

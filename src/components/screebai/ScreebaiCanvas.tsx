@@ -1,6 +1,9 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Locale } from '@/i18n/settings';
 
 interface DrawingCanvasProps {
   onSubmit: (imageDataUrl: string) => void;
@@ -9,6 +12,9 @@ interface DrawingCanvasProps {
 type Tool = 'pen' | 'eraser';
 
 const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
+  const params = useParams();
+  const locale = (params?.locale as Locale) || 'it';
+  const { t } = useTranslation(locale);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<Tool>('pen');
@@ -32,22 +38,15 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
         const container = canvasRef.current.parentElement;
         if (container) {
           // Calcola l'altezza disponibile in base alla viewport
-          const viewportHeight = window.innerHeight;
           const containerRect = container.getBoundingClientRect();
-          const containerTop = containerRect.top;
           
           // Calcola l'altezza della barra degli strumenti in base alla dimensione dello schermo
           const isMobile = window.innerWidth < 640;
-          const toolbarHeight = isMobile ? 36 : 40; // Altezza ridotta su mobile
-          const safetyMargin = isMobile ? 8 : 16; // Margine di sicurezza aggiuntivo su mobile
           
-          // Calcola l'altezza massima disponibile per il canvas
-          // Sottraiamo la posizione top del container, l'altezza della toolbar e un margine di sicurezza
-          const availableHeight = viewportHeight - containerTop - toolbarHeight - safetyMargin;
-          
-          // Usa l'altezza disponibile o l'altezza del container, quella che è minore
-          const height = Math.min(availableHeight, containerRect.height);
+          // Calcoliamo l'altezza del contenitore e la usiamo direttamente
+          // Questo assicura che il canvas occupi tutto lo spazio disponibile
           const width = containerRect.width;
+          const height = containerRect.height;
           
           setCanvasSize({ width, height });
           
@@ -154,14 +153,14 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full mt-1 pt-0">
       {/* Drawing area */}
-      <div className="flex-grow relative border border-gray-300 rounded-md overflow-hidden">
+      <div className="flex-grow relative border border-[#334155] rounded-2xl overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
           width={canvasSize.width}
           height={canvasSize.height}
-          className="absolute top-0 left-0 touch-none"
+          className="absolute top-0 left-0 touch-none w-full h-full"
           style={{ touchAction: 'none' }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
@@ -174,36 +173,32 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
       </div>
       
       {/* Tools */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 shadow-lg py-1 px-2 flex justify-between items-center gap-1 md:static md:bg-transparent md:shadow-none md:mt-2 md:px-0 md:py-0">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#2a3b52] shadow-lg py-2 px-3 flex justify-between items-center gap-2 md:static md:bg-transparent md:shadow-none md:mt-3 md:px-0 md:py-0">
         <div className="flex gap-1">
           <button
-            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'pen' ? 'text-white' : 'bg-gray-200'}`}
-            style={currentTool === 'pen' ? { backgroundColor: 'var(--primary)' } : {}}
+            className={`px-3 py-1.5 rounded-xl text-sm font-medium ${currentTool === 'pen' ? 'bg-gradient-to-r from-[#8257e6] to-[#c026d3] text-white' : 'bg-[#334155] text-white'}`}
             onClick={() => setCurrentTool('pen')}
           >
-            Penna
+            {t("screebai.submit")}
           </button>
           <button
-            className={`px-2 py-1 rounded-md text-xs ${currentTool === 'eraser' ? 'text-white' : 'bg-gray-200'}`}
-            style={currentTool === 'eraser' ? { backgroundColor: 'var(--primary)' } : {}}
+            className={`px-3 py-1.5 rounded-xl text-sm font-medium ${currentTool === 'eraser' ? 'bg-gradient-to-r from-[#8257e6] to-[#c026d3] text-white' : 'bg-[#334155] text-white'}`}
             onClick={() => setCurrentTool('eraser')}
           >
-            Gomma
+            {t("screebai.erase")}
           </button>
           <button
-            className="px-2 py-1 text-white rounded-md text-xs"
-            style={{ backgroundColor: 'var(--secondary)' }}
+            className="px-3 py-1.5 rounded-xl text-sm font-medium bg-[#334155] text-white hover:bg-[#475569] transition-colors"
             onClick={clearCanvas}
           >
-            Cancella tutto
+            {t("screebai.eraseAll")}
           </button>
         </div>
         <button
-          className="px-3 py-1 text-white rounded-md text-xs font-bold"
-          style={{ backgroundColor: 'var(--primary)' }}
+          className="px-3 py-1.5 rounded-xl text-sm font-medium bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
           onClick={exportImage}
         >
-          Finito
+          Invia
         </button>
       </div>
     </div>
