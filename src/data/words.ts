@@ -1,5 +1,10 @@
 import { Locale } from "@/i18n/settings";
 
+export const devEasyWords = {
+  en: ["dot"],
+  it: ["punto"],
+};
+
 // List of random words for drawing prompts
 export const words = {
   en: [
@@ -491,7 +496,7 @@ export const words = {
     "parking",
     "gas station",
     "workshop",
-    "garage"
+    "garage",
   ],
   it: [
     "gatto",
@@ -989,7 +994,10 @@ export const words = {
 
 // Function to get a random word from the list
 export const getRandomWord = (locale: Locale): string => {
-  const randomIndex = Math.floor(Math.random() * words[locale].length);
-
-  return words[locale][randomIndex];
+  // Usa devEasyWords in ambiente di sviluppo, words in produzione
+  // const wordList = process.env.NODE_ENV === 'development' ? devEasyWords : words;
+  const wordList = words;
+  
+  const randomIndex = Math.floor(Math.random() * wordList[locale].length);
+  return wordList[locale][randomIndex];
 };

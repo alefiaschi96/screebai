@@ -83,7 +83,7 @@ export default function GamesPage({
           </Link>
         </div>
 
-        {/* Gioco 2 - In sviluppo */}
+        {/* CoCatch */}
         <div className="bg-[#2a3b52] rounded-2xl overflow-hidden transition-all hover:bg-[#334155]">
           <Link href="/cocatch" className="block">
             <div className="flex items-center p-4">

@@ -7,11 +7,12 @@ import { Locale } from '@/i18n/settings';
 
 interface DrawingCanvasProps {
   onSubmit: (imageDataUrl: string) => void;
+  setCanvasRef?: (canvas: HTMLCanvasElement | null) => void;
 }
 
 type Tool = 'pen' | 'eraser';
 
-const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
+const ScreebaiCanvas = ({ onSubmit, setCanvasRef }: DrawingCanvasProps) => {
   const params = useParams();
   const locale = (params?.locale as Locale) || 'it';
   const { t } = useTranslation(locale);
@@ -32,6 +33,11 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
 
   // Set up canvas and context
   useEffect(() => {
+    // Passa il riferimento al canvas al componente genitore se la prop è fornita
+    if (setCanvasRef && canvasRef.current) {
+      setCanvasRef(canvasRef.current);
+    }
+    
     const updateCanvasSize = () => {
       if (canvasRef.current) {
         // Get the parent container dimensions
@@ -87,6 +93,11 @@ const ScreebaiCanvas = ({ onSubmit }: DrawingCanvasProps) => {
       window.removeEventListener('orientationchange', updateCanvasSize);
       clearTimeout(initTimer);
       clearTimeout(resizeTimer);
+      
+      // Rimuovi il riferimento quando il componente viene smontato
+      if (setCanvasRef) {
+        setCanvasRef(null);
+      }
     };
   }, []);
 

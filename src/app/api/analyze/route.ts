@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 
 // Initialize the OpenAI client
 const openai = new OpenAI({
@@ -11,10 +11,7 @@ export async function POST(request: NextRequest) {
     const { imageBase64 } = await request.json();
 
     if (!imageBase64) {
-      return NextResponse.json(
-        { error: 'Immagine mancante' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Immagine mancante" }, { status: 400 });
     }
 
     // Call GPT-4 Vision API
@@ -24,27 +21,36 @@ export async function POST(request: NextRequest) {
         {
           role: "user",
           content: [
-            { type: "text", text: "Guarda questo disegno e rispondi con UNA SOLA PAROLA che descrive cosa vedi." },
+            {
+              type: "text",
+              text:
+                "Guarda questo disegno e rispondi con UNA SOLA PAROLA che descrive cosa vedi. " +
+                "La parola deve essere un qualcosa che l'utente può aver disegnato in pochi secondi, " +
+                "quindi difficilmente qualcosa di troppo complesso, o nessun concetto astratto.",
+            },
             {
               type: "image_url",
               image_url: {
-                "url": imageBase64,
-              }
-            }
-          ]
-        }
+                url: imageBase64,
+              },
+            },
+          ],
+        },
       ],
       max_tokens: 10,
     });
 
     // Extract the single word response
-    const result = (response.choices[0]?.message?.content?.trim().toLowerCase() || "Indefinito").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+    const result = (
+      response.choices[0]?.message?.content?.trim().toLowerCase() ||
+      "Indefinito"
+    ).replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
     return NextResponse.json({ result });
   } catch (error) {
-    console.error('Error analyzing drawing:', error);
+    console.error("Error analyzing drawing:", error);
     return NextResponse.json(
-      { error: 'Errore durante l\'analisi dell\'immagine' },
+      { error: "Errore durante l'analisi dell'immagine" },
       { status: 500 }
     );
   }
