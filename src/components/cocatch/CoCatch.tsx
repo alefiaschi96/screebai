@@ -7,7 +7,8 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Locale } from "@/i18n/settings";
 
-const availableImages = [
+// Immagini normali che aumentano il punteggio quando cliccate
+const normalImages = [
   "/images/01-min.png",
   "/images/02-min.png",
   "/images/03-min.png",
@@ -30,6 +31,8 @@ const availableImages = [
   "/images/18_a-min.png",
 ];
 
+// Immagine bug che penalizza quando cliccata
+const bugImage = "/images/bug-min.png";
 
 const CoCatch = () => {
   const params = useParams();
@@ -48,9 +51,11 @@ const CoCatch = () => {
     top: number;
     left: number;
     id: number;
+    isBug?: boolean;
   } | null>(null);
   const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false);
   const [, setUpdatingScore] = useState<boolean>(false);
+  const [bugShownCount, setBugShownCount] = useState<number>(0);
 
   // Riferimenti per i timer
   const gameTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -69,8 +74,9 @@ const CoCatch = () => {
   // Precarica tutte le immagini
   const preloadImages = () => {
     if (imagesPreloaded) return;
-    
-    const preloadImagePromises = availableImages.map((src) => {
+
+    const allImages = [...normalImages, bugImage];
+    const preloadImagePromises = allImages.map((src) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.src = src;
@@ -81,11 +87,11 @@ const CoCatch = () => {
 
     Promise.all(preloadImagePromises)
       .then(() => {
-        console.log('Tutte le immagini sono state precaricate');
+        console.log("Tutte le immagini sono state precaricate");
         setImagesPreloaded(true);
       })
       .catch((error) => {
-        console.error('Errore nel precaricare le immagini:', error);
+        console.error("Errore nel precaricare le immagini:", error);
         // Continuiamo comunque con il gioco anche se alcune immagini non si sono caricate
         setImagesPreloaded(true);
       });
@@ -95,13 +101,17 @@ const CoCatch = () => {
   const startGame = () => {
     // Assicuriamoci che le immagini siano precaricate
     preloadImages();
-    
+
     gameActiveRef.current = true;
     setGameStarted(true);
     setGameOver(false);
     setScore(0);
     setTimeLeft(GAME_DURATION);
     setCurrentImage(null);
+    setBugShownCount(0);
+
+    // Mostra subito la prima immagine all'inizio del gioco
+    setTimeout(() => showRandomImage(), 500);
 
     // Avvia timer
     if (gameTimerRef.current) clearInterval(gameTimerRef.current);
@@ -140,28 +150,72 @@ const CoCatch = () => {
 
   // Mostra un'immagine casuale in una posizione casuale
   const showRandomImage = () => {
-    if (!gameActiveRef.current) return;
+    if (!gameActiveRef.current || !gameAreaRef.current) return;
 
-    // Seleziona un'immagine casuale
-    const randomIndex = Math.floor(Math.random() * availableImages.length);
-    const randomImage = availableImages[randomIndex];
+    const gameArea = gameAreaRef.current;
+    const gameAreaRect = gameArea.getBoundingClientRect();
 
-    // Genera una posizione casuale (in percentuale)
-    const randomTop = Math.floor(Math.random() * 80); // 0-80% dall'alto
-    const randomLeft = Math.floor(Math.random() * 80); // 0-80% da sinistra
+    // Dimensioni dell'immagine (approssimative)
+    const imageWidth = 80;
+    const imageHeight = 80;
 
-    // Incrementa l'ID dell'immagine per tracciare le diverse istanze
+    // Calcola posizione casuale all'interno dell'area di gioco
+    const maxLeft = Math.max(10, gameAreaRect.width - imageWidth);
+    const maxTop = Math.max(10, gameAreaRect.height - imageHeight);
+    const randomLeft = Math.floor(Math.random() * maxLeft);
+    const randomTop = Math.floor(Math.random() * maxTop);
+
+    // Incrementa l'ID dell'immagine
     imageIdRef.current += 1;
 
-    // Imposta l'immagine corrente
-    setCurrentImage({
-      src: randomImage,
-      top: randomTop,
-      left: randomLeft,
-      id: imageIdRef.current,
-    });
+    // Determina se mostrare l'immagine bug
+    // Forziamo l'apparizione del bug almeno un paio di volte durante la partita
+    // La probabilità aumenta con il passare del tempo se non è ancora apparso abbastanza
+    const timeElapsed = GAME_DURATION - timeLeft;
+    const gameProgress = timeElapsed / GAME_DURATION; // 0 a 1
 
-    // Imposta un timer per rimuovere l'immagine dopo IMAGE_DURATION
+    // Aumentiamo la probabilità di mostrare il bug se:
+    // 1. Non è stato mostrato abbastanza volte
+    // 2. Siamo oltre la metà del gioco
+    let showBug = false;
+
+    if (bugShownCount < 2 && gameProgress > 0.3) {
+      // Aumenta la probabilità di mostrare il bug man mano che il gioco avanza
+      const bugProbability = bugShownCount === 0 ? 0.6 : 0.3;
+      showBug = Math.random() < bugProbability;
+    } else if (bugShownCount < 3) {
+      // Probabilità normale di mostrare il bug
+      showBug = Math.random() < 0.15;
+    } else {
+      // Probabilità ridotta dopo che è già apparso abbastanza volte
+      showBug = Math.random() < 0.05;
+    }
+
+    if (showBug) {
+      // Mostra l'immagine bug
+      setBugShownCount((prev) => prev + 1);
+      setCurrentImage({
+        src: bugImage,
+        top: randomTop,
+        left: randomLeft,
+        id: imageIdRef.current,
+        isBug: true,
+      });
+    } else {
+      // Seleziona un'immagine casuale normale
+      const randomIndex = Math.floor(Math.random() * normalImages.length);
+      const randomImage = normalImages[randomIndex];
+
+      setCurrentImage({
+        src: randomImage,
+        top: randomTop,
+        left: randomLeft,
+        id: imageIdRef.current,
+        isBug: false,
+      });
+    }
+
+    // Imposta un timer per rimuovere l'immagine dopo un breve periodo
     if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
     imageTimerRef.current = setTimeout(() => {
       setCurrentImage(null);
@@ -169,32 +223,34 @@ const CoCatch = () => {
       // Mostra la prossima immagine dopo un breve ritardo
       setTimeout(() => {
         if (gameActiveRef.current) showRandomImage();
-      }, 300);
+      }, 400);
     }, IMAGE_DURATION);
   };
 
-  // Gestisce il click su un'immagine
+  // Gestisce il click sull'immagine
   const handleImageClick = () => {
-    // Incrementa il punteggio
-    setScore((prev) => {
-      const updated = prev + 1;
-      scoreRef.current = updated;
-      return updated;
-    });
+    if (!currentImage) return;
+
+    // Controlla se è l'immagine bug
+    if (currentImage.isBug) {
+      // Penalizza il giocatore se clicca sul bug
+      const newScore = Math.max(0, score - 2);
+      setScore(newScore);
+      scoreRef.current = newScore;
+    } else {
+      // Incrementa il punteggio per le immagini normali
+      const newScore = score + 1;
+      setScore(newScore);
+      scoreRef.current = newScore;
+    }
 
     // Rimuovi l'immagine corrente
     setCurrentImage(null);
 
-    // Ferma il timer dell'immagine
-    if (imageTimerRef.current) {
-      clearTimeout(imageTimerRef.current);
-      imageTimerRef.current = null;
+    // Mostra una nuova immagine dopo un breve ritardo
+    if (gameActiveRef.current) {
+      imageTimerRef.current = setTimeout(showRandomImage, 500);
     }
-
-    // Mostra la prossima immagine dopo un breve ritardo
-    setTimeout(() => {
-      if (gameActiveRef.current) showRandomImage();
-    }, 300);
   };
 
   // Aggiorna il punteggio dell'utente nel database
@@ -245,7 +301,7 @@ const CoCatch = () => {
   useEffect(() => {
     // Precarica le immagini appena il componente viene montato
     preloadImages();
-    
+
     return () => {
       // Pulizia dei timer quando il componente viene smontato
       if (gameTimerRef.current) clearInterval(gameTimerRef.current);
@@ -296,7 +352,10 @@ const CoCatch = () => {
             {t("cocatch.catchImages")}
           </h2>
           <p className="text-lg text-gray-300 mb-6">
-            {t("cocatch.instructions")}
+            {t("cocatch.instructions_1")}
+          </p>
+          <p className="text-lg text-gray-300 mb-6">
+            {t("cocatch.instructions_2")}
           </p>
           <button
             className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
@@ -316,24 +375,40 @@ const CoCatch = () => {
             <div
               className="absolute cursor-pointer"
               style={{
-                top: `${currentImage.top}%`,
-                left: `${currentImage.left}%`,
+                top: `${currentImage.top}px`,
+                left: `${currentImage.left}px`,
                 transition: "all 0.2s ease-in-out",
+                position: "absolute",
+                zIndex: 5,
               }}
               onClick={handleImageClick}
             >
               <div
-                className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-white rounded-full p-2 shadow-lg"
+                className={`${
+                  currentImage.isBug
+                    ? "w-28 h-28 sm:w-28 sm:h-28 bg-red-100 border-2 border-red-500"
+                    : "w-24 h-24 sm:w-24 sm:h-24 bg-white"
+                } flex items-center justify-center rounded-full p-2 shadow-lg`}
                 style={{
-                  transform: "scale(1)",
-                  animation: "pulse 1s infinite",
+                  transform: currentImage.isBug
+                    ? "scale(1.1) rotate(-10deg)"
+                    : "scale(1)",
+                  animation: currentImage.isBug ? "pulse 0.7s infinite" : "",
                 }}
               >
                 <img
                   src={currentImage.src}
-                  alt="Catch me!"
-                  className="w-full h-full object-contain"
+                  alt={currentImage.isBug ? "Don't catch me!" : "Catch me!"}
+                  className={`w-full h-full object-contain ${
+                    currentImage.isBug ? "animate-bounce" : ""
+                  }`}
+                  draggable="false"
                 />
+                {currentImage.isBug && (
+                  <div className="absolute -top-4 -right-4 bg-red-500 text-white text-xs font-bold rounded-full w-8 h-8 flex items-center justify-center animate-pulse">
+                    -1
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -89,7 +89,8 @@
     "playAgain": "Play again",
     "loading": "Loading...",
     "catchImages": "Catch the Codeployers!",
-    "instructions": "Click on the Codeployers before they disappear"
+    "instructions_1": "Click on the Codeployers before they disappear",
+    "instructions_2": "Watch out for bugs! Clicking on them will cost you points!"
   },
   "errors": {
     "nicknameVerification": "Error verifying nickname",
