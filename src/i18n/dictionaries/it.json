@@ -89,7 +89,8 @@
     "playAgain": "Gioca ancora",
     "loading": "Caricamento...",
     "catchImages": "Acchiappa i Codeployers!",
-    "instructions": "Clicca sui Codeployers prima che scompaiano"
+    "instructions_1": "Clicca sui Codeployers prima che scompaiano",
+    "instructions_2": "Attento ai bug! Cliccandoli perderai dei punti!"
   },
   "errors": {
     "nicknameVerification": "Errore durante la verifica del nickname",
