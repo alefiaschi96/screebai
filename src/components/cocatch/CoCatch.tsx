@@ -49,6 +49,7 @@ const CoCatch = () => {
     left: number;
     id: number;
   } | null>(null);
+  const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false);
   const [, setUpdatingScore] = useState<boolean>(false);
 
   // Riferimenti per i timer
@@ -65,8 +66,36 @@ const CoCatch = () => {
   const IMAGE_DURATION =
     parseInt(process.env.NEXT_PUBLIC_IMAGE_DURATION as string) || 1500; // Durata di visualizzazione dell'immagine in ms
 
+  // Precarica tutte le immagini
+  const preloadImages = () => {
+    if (imagesPreloaded) return;
+    
+    const preloadImagePromises = availableImages.map((src) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(src);
+        img.onerror = () => reject(`Failed to load image: ${src}`);
+      });
+    });
+
+    Promise.all(preloadImagePromises)
+      .then(() => {
+        console.log('Tutte le immagini sono state precaricate');
+        setImagesPreloaded(true);
+      })
+      .catch((error) => {
+        console.error('Errore nel precaricare le immagini:', error);
+        // Continuiamo comunque con il gioco anche se alcune immagini non si sono caricate
+        setImagesPreloaded(true);
+      });
+  };
+
   // Inizia il gioco
   const startGame = () => {
+    // Assicuriamoci che le immagini siano precaricate
+    preloadImages();
+    
     gameActiveRef.current = true;
     setGameStarted(true);
     setGameOver(false);
@@ -212,11 +241,16 @@ const CoCatch = () => {
     }
   };
 
-  // Cleanup quando il componente viene smontato
+  // Effetti per gestire il ciclo di vita del componente
   useEffect(() => {
+    // Precarica le immagini appena il componente viene montato
+    preloadImages();
+    
     return () => {
+      // Pulizia dei timer quando il componente viene smontato
       if (gameTimerRef.current) clearInterval(gameTimerRef.current);
       if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
+      gameActiveRef.current = false;
     };
   }, []);
 
@@ -267,8 +301,9 @@ const CoCatch = () => {
           <button
             className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
             onClick={startGame}
+            disabled={!imagesPreloaded}
           >
-            {t("cocatch.startGame")}
+            {imagesPreloaded ? t("cocatch.startGame") : t("cocatch.loading")}
           </button>
         </div>
       ) : (

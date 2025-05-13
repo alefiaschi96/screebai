@@ -87,6 +87,7 @@
     "gameOver": "Game over!",
     "finalScore": "Final score",
     "playAgain": "Play again",
+    "loading": "Loading...",
     "catchImages": "Catch the Codeployers!",
     "instructions": "Click on the Codeployers before they disappear"
   },

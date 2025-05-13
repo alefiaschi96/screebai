@@ -87,6 +87,7 @@
     "gameOver": "Partita terminata!",
     "finalScore": "Punteggio finale",
     "playAgain": "Gioca ancora",
+    "loading": "Caricamento...",
     "catchImages": "Acchiappa i Codeployers!",
     "instructions": "Clicca sui Codeployers prima che scompaiano"
   },
