@@ -7,19 +7,29 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Locale } from "@/i18n/settings";
 
-// Simulazione di immagini disponibili nella cartella public/images
 const availableImages = [
-  "/images/01.png",
-  "/images/02.png",
-  "/images/03.png",
-  "/images/04.png",
-  "/images/05.png",
-  "/images/06.png",
-  "/images/07.png",
-  "/images/08.png",
-  "/images/09.png",
-  "/images/10.png",
+  "/images/01-min.png",
+  "/images/02-min.png",
+  "/images/03-min.png",
+  "/images/04-min.png",
+  "/images/05-min.png",
+  "/images/06-min.png",
+  "/images/07-min.png",
+  "/images/08-min.png",
+  "/images/09-min.png",
+  "/images/10-min.png",
+  "/images/11-min.png",
+  "/images/12_a-min.png",
+  "/images/13-min.png",
+  "/images/14-min.png",
+  "/images/15-min.png",
+  "/images/16-min.png",
+  "/images/16_a-min.png",
+  "/images/17-min.png",
+  "/images/17_a-min.png",
+  "/images/18_a-min.png",
 ];
+
 
 const CoCatch = () => {
   const params = useParams();
@@ -193,7 +203,6 @@ const CoCatch = () => {
       if (error) {
         console.error("Errore durante l'aggiornamento del punteggio:", error);
       } else {
-        // Aggiorna anche il punteggio nel contesto di autenticazione
         updateScore(updatedScore);
       }
     } catch (error) {
@@ -248,7 +257,7 @@ const CoCatch = () => {
           </button>
         </div>
       ) : !gameStarted ? (
-        <div className="flex flex-col items-center justify-center flex-grow text-center">
+        <div className="flex flex-col items-center justify-center flex-grow text-center px-2">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             {t("cocatch.catchImages")}
           </h2>

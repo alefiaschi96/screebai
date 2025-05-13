@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
               text:
                 "Guarda questo disegno e rispondi con UNA SOLA PAROLA che descrive cosa vedi. " +
                 "La parola deve essere un qualcosa che l'utente può aver disegnato in pochi secondi, " +
-                "quindi difficilmente qualcosa di troppo complesso, o nessun concetto astratto.",
+                "potenzialmente anche da un bambino, con il dito sullo schermo dello smartphone.",
             },
             {
               type: "image_url",

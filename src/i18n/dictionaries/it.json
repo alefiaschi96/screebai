@@ -15,6 +15,7 @@
     "login": "Accedi",
     "leaderboard": "Classifica",
     "games": "Giochi",
+    "language": "Lingua",
     "email": "Email",
     "password": "Password",
     "needAccount": "Se non hai ancora un account,",
@@ -66,6 +67,9 @@
     "correct": "Corretto! +{{points}} punti",
     "notMatching": "Non corrisponde a",
     "playAgain": "Gioca ancora",
+    "startGame": "Inizia partita",
+    "drawAndGuess": "Disegna e fai indovinare all'AI!",
+    "drawInstructions": "Disegna la parola mostrata e l'intelligenza artificiale cercherà di indovinarla",
     "submit": "Invia",
     "erase": "Gomma",
     "eraseAll": "Cancella tutto",
@@ -83,8 +87,8 @@
     "gameOver": "Partita terminata!",
     "finalScore": "Punteggio finale",
     "playAgain": "Gioca ancora",
-    "catchImages": "Acchiappa le immagini!",
-    "instructions": "Clicca sulle immagini prima che scompaiano"
+    "catchImages": "Acchiappa i Codeployers!",
+    "instructions": "Clicca sui Codeployers prima che scompaiano"
   },
   "errors": {
     "nicknameVerification": "Errore durante la verifica del nickname",

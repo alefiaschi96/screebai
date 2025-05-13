@@ -15,6 +15,7 @@
     "login": "Login",
     "leaderboard": "Leaderboard",
     "games": "Games",
+    "language": "Language",
     "email": "Email",
     "password": "Password",
     "needAccount": "If you don't have an account yet,",
@@ -66,6 +67,9 @@
     "correct": "Correct! +{{points}} point",
     "notMatching": "Does not match",
     "playAgain": "Play again",
+    "startGame": "Start game",
+    "drawAndGuess": "Draw and let AI guess!",
+    "drawInstructions": "Draw the shown word and the artificial intelligence will try to guess it",
     "submit": "Submit",
     "erase": "Eraser",
     "eraseAll": "Clear all",
@@ -83,8 +87,8 @@
     "gameOver": "Game over!",
     "finalScore": "Final score",
     "playAgain": "Play again",
-    "catchImages": "Catch the images!",
-    "instructions": "Click on the images before they disappear"
+    "catchImages": "Catch the Codeployers!",
+    "instructions": "Click on the Codeployers before they disappear"
   },
   "errors": {
     "nicknameVerification": "Error verifying nickname",

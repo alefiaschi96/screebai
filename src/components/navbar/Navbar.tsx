@@ -3,26 +3,44 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Locale, i18n } from "@/i18n/settings";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const { user, signOut, isLoading, userScore } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [locale, setLocale] = useState<Locale>(i18n.defaultLocale as Locale);
-
-  // Otteniamo la lingua dal pathname
+  const [isNavigating, setIsNavigating] = useState(false);
+  const router = useRouter();
   const pathname = usePathname();
 
-  // Estraiamo la lingua dal pathname
+  const pendingHref = useRef<string | null>(null);
+
   useEffect(() => {
     const pathnameLocale = pathname?.split("/")[1];
     if (pathnameLocale && i18n.locales.includes(pathnameLocale as Locale)) {
       setLocale(pathnameLocale as Locale);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    if (isNavigating && pendingHref.current && pathname === pendingHref.current) {
+      setIsMenuOpen(false);
+      setIsNavigating(false);
+      pendingHref.current = null;
+    }
+  }, [pathname, isNavigating]);
+
+  const handleNav = (href: string) => {
+    if (href !== pathname) {
+      setIsNavigating(true);
+      pendingHref.current = href;
+      router.push(href);
+    } else {
+      setIsMenuOpen(false);
+    }
+  };
 
   const { t } = useTranslation(locale);
 
@@ -32,13 +50,14 @@ export default function Navbar() {
         <div className="flex justify-between h-14 sm:h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center">
-                <span
-                  className="text-xl sm:text-2xl font-bold text-[#f59e0b]"
-                >
+              <button
+                onClick={() => handleNav(`/${locale}`)}
+                className="flex items-center focus:outline-none"
+              >
+                <span className="text-xl sm:text-2xl font-bold text-[#f59e0b]">
                   <span className="text-[#6366f1]">Co</span>games
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -50,7 +69,8 @@ export default function Navbar() {
                       {userScore.user_nick || user.email}
                     </span>
                     <span className="text-sm text-[#94a3b8] font-bold">
-                      {t("navbar.points")}: <span className="text-[#f59e0b]">{userScore.score}</span>
+                      {t("navbar.points")}:{" "}
+                      <span className="text-[#f59e0b]">{userScore.score}</span>
                     </span>
                     {/* Language Switcher */}
                     <div className="mr-4">
@@ -70,13 +90,13 @@ export default function Navbar() {
                     <div className="mr-4">
                       <LanguageSwitcher />
                     </div>
-                    <Link
-                      href="/login"
+                    <button
+                      onClick={() => handleNav(`/${locale}/login`)}
                       className="btn-primary inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white"
                       style={{ backgroundColor: "#6366f1" }}
                     >
                       {t("navbar.login")}
-                    </Link>
+                    </button>
                   </>
                 )}
               </>
@@ -86,8 +106,8 @@ export default function Navbar() {
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
             {!isLoading && user && (
-              <Link
-                href="/leaderboard"
+              <button
+                onClick={() => handleNav(`/${locale}/leaderboard`)}
                 className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
                 style={{ color: "#6366f1" }}
               >
@@ -106,7 +126,7 @@ export default function Navbar() {
                   />
                 </svg>
                 {t("navbar.leaderboard")}
-              </Link>
+              </button>
             )}
 
             {/* Menu button */}
@@ -162,8 +182,9 @@ export default function Navbar() {
           <div className="flex flex-col h-full">
             {/* Menu header with close button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#334155]">
-              <div className="font-bold text-xl">
-                <span className="text-[#6366f1]">Co</span><span className="text-[#f59e0b]">games</span>
+              <div className="font-bold text-xl" onClick={() => handleNav(`/${locale}`)}>
+                <span className="text-[#6366f1]">Co</span>
+                <span className="text-[#f59e0b]">games</span>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -199,16 +220,17 @@ export default function Navbar() {
                         </div>
                         <div className="text-[#94a3b8]">
                           {t("navbar.points")}{" "}
-                          <span className="font-bold text-[#f59e0b]">{userScore.score}</span>
+                          <span className="font-bold text-[#f59e0b]">
+                            {userScore.score}
+                          </span>
                         </div>
                       </div>
 
                       {/* Navigation links */}
                       <div className="space-y-3">
-                        <Link
-                          href="/"
-                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748]"
-                          onClick={() => setIsMenuOpen(false)}
+                        <button
+                          onClick={() => handleNav(`/${locale}`)}
+                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                         >
                           <span className="text-white font-medium">
                             {t("navbar.games")}
@@ -225,12 +247,11 @@ export default function Navbar() {
                               clipRule="evenodd"
                             />
                           </svg>
-                        </Link>
+                        </button>
 
-                        <Link
-                          href="/leaderboard"
-                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748]"
-                          onClick={() => setIsMenuOpen(false)}
+                        <button
+                          onClick={() => handleNav(`/${locale}/leaderboard`)}
+                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                         >
                           <span className="text-white font-medium">
                             {t("navbar.leaderboard")}
@@ -247,7 +268,17 @@ export default function Navbar() {
                               clipRule="evenodd"
                             />
                           </svg>
-                        </Link>
+                        </button>
+
+                        {/* Language switcher */}
+                        <div className="bg-[#1e293b] rounded-lg p-3 border border-[#334155]">
+                          <div className="flex flex-col space-y-2">
+                            <span className="text-white font-medium text-center mb-2">
+                              {t("navbar.language")}
+                            </span>
+                            <LanguageSwitcher isMobile={true} />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Logout button */}
@@ -263,15 +294,26 @@ export default function Navbar() {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex justify-center">
-                      <Link
-                        href="/login"
-                        className="p-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors"
-                        style={{ backgroundColor: "#6366f1" }}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {t("navbar.login")}
-                      </Link>
+                    <div className="space-y-6">
+                      {/* Language switcher */}
+                      <div className="bg-[#1e293b] rounded-lg p-4 border border-[#334155]">
+                        <div className="flex flex-col space-y-2">
+                          <span className="text-white font-medium text-center mb-2">
+                            {t("navbar.language")}
+                          </span>
+                          <LanguageSwitcher isMobile={true} />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => handleNav(`/${locale}/login`)}
+                          className="p-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors w-full"
+                          style={{ backgroundColor: "#6366f1" }}
+                        >
+                          {t("navbar.login")}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

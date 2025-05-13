@@ -22,6 +22,7 @@ const ScreebAi = () => {
   const [, setScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -112,6 +113,11 @@ const ScreebAi = () => {
     startTimer();
   };
 
+  const startGame = () => {
+    setGameStarted(true);
+    resetGame();
+  };
+
   const resetGame = () => {
     setScore(0);
     scoreRef.current = 0;
@@ -166,21 +172,23 @@ const ScreebAi = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-1 sm:p-2 md:p-6">
-      <div className="flex justify-between items-center mb-1 sm:mb-2 p-3 rounded-lg text-xs sm:text-sm bg-[#2a3b52] text-white">
-        <div className="font-semibold">
-          {t("screebai.attempts")} {attempts}/{MAX_ATTEMPTS}
+      {gameStarted && (
+        <div className="flex justify-between items-center mb-1 sm:mb-2 p-3 rounded-lg text-xs sm:text-sm bg-[#2a3b52] text-white">
+          <div className="font-semibold">
+            {t("screebai.attempts")} {attempts}/{MAX_ATTEMPTS}
+          </div>
+          <div className="font-semibold">
+            {t("screebai.time")}{" "}
+            <span className={timeLeft <= 10 ? "text-red-500 font-bold" : ""}>
+              {timeLeft}
+              {t("screebai.seconds")}
+            </span>
+          </div>
+          <div className="font-semibold">
+            {t("screebai.points")} {scoreRef.current}
+          </div>
         </div>
-        <div className="font-semibold">
-          {t("screebai.time")}{" "}
-          <span className={timeLeft <= 10 ? "text-red-500 font-bold" : ""}>
-            {timeLeft}
-            {t("screebai.seconds")}
-          </span>
-        </div>
-        <div className="font-semibold">
-          {t("screebai.points")} {scoreRef.current}
-        </div>
-      </div>
+      )}
 
       {gameOver ? (
         <div className="flex flex-col items-center justify-center flex-grow text-center">
@@ -195,6 +203,21 @@ const ScreebAi = () => {
             onClick={resetGame}
           >
             {t("screebai.playAgain")}
+          </button>
+        </div>
+      ) : !gameStarted ? (
+        <div className="flex flex-col items-center justify-center flex-grow text-center px-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            {t("screebai.drawAndGuess")}
+          </h2>
+          <p className="text-lg text-gray-300 mb-6">
+            {t("screebai.drawInstructions")}
+          </p>
+          <button
+            className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
+            onClick={startGame}
+          >
+            {t("screebai.startGame")}
           </button>
         </div>
       ) : (
