@@ -104,7 +104,7 @@ export default function Navbar() {
 
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
-            <button
+            {/* <button
               onClick={() => handleNav(`/${locale}/leaderboard`)}
               className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
             >
@@ -121,7 +121,7 @@ export default function Navbar() {
                 />
               </svg>
               {t("navbar.leaderboard")}
-            </button>
+            </button> */}
 
             {/* Menu button */}
             <button
@@ -243,7 +243,7 @@ export default function Navbar() {
                           </svg>
                         </button>
 
-                        <button
+                        {/* <button
                           onClick={() => handleNav(`/${locale}/leaderboard`)}
                           className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                         >
@@ -260,7 +260,7 @@ export default function Navbar() {
                               clipRule="evenodd"
                             />
                           </svg>
-                        </button>
+                        </button> */}
 
                         {/* Language switcher */}
                         <div className="bg-[#1e293b] rounded-lg p-3 border border-[#334155]">
