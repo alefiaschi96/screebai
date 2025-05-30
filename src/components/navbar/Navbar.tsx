@@ -104,29 +104,24 @@ export default function Navbar() {
 
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
-            {!isLoading && user && (
-              <button
-                onClick={() => handleNav(`/${locale}/leaderboard`)}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
-                style={{ color: "#6366f1" }}
+            <button
+              onClick={() => handleNav(`/${locale}/leaderboard`)}
+              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            >
+              <svg
+                className="mr-1 h-4 w-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-                {t("navbar.leaderboard")}
-              </button>
-            )}
+                <path
+                  fillRule="evenodd"
+                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t("navbar.leaderboard")}
+            </button>
 
             {/* Menu button */}
             <button
@@ -252,18 +247,16 @@ export default function Navbar() {
                           onClick={() => handleNav(`/${locale}/leaderboard`)}
                           className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                         >
-                          <span className="text-white font-medium">
-                            {t("navbar.leaderboard")}
-                          </span>
+                          <span className="text-white">{t("navbar.leaderboard")}</span>
                           <svg
                             className="h-5 w-5 text-gray-400"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
                             fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               fillRule="evenodd"
-                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
                               clipRule="evenodd"
                             />
                           </svg>

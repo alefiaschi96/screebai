@@ -87,7 +87,6 @@ const CoCatch = () => {
 
     Promise.all(preloadImagePromises)
       .then(() => {
-        console.log("Tutte le immagini sono state precaricate");
         setImagesPreloaded(true);
       })
       .catch((error) => {

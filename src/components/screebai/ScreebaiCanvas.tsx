@@ -154,12 +154,37 @@ const ScreebaiCanvas = ({ onSubmit, setCanvasRef }: DrawingCanvasProps) => {
 
 
 
-  // Export canvas as PNG in base64 format
+  // Export canvas as PNG in base64 format with white background
   const exportImage = () => {
     if (canvasRef.current) {
-      const dataUrl = canvasRef.current.toDataURL('image/png');
-      onSubmit(dataUrl);
-      clearCanvas();
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        // Crea un canvas temporaneo con sfondo bianco
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        if (tempCtx) {
+          // Riempi il canvas temporaneo con sfondo bianco
+          tempCtx.fillStyle = 'white';
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+          
+          // Disegna l'immagine originale sopra lo sfondo bianco
+          tempCtx.drawImage(canvas, 0, 0);
+          
+          // Ottieni l'URL dati dal canvas temporaneo
+          const dataUrl = tempCanvas.toDataURL('image/png');
+          
+          // Invia l'immagine con sfondo bianco
+          onSubmit(dataUrl);
+          
+          // Pulisci il canvas per il prossimo disegno
+          clearCanvas();
+        }
+      }
     }
   };
 

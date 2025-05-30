@@ -6,6 +6,7 @@ import { generateNickname } from "@/data/nicknames";
 import { useRouter } from "next/navigation";
 import { Locale } from "@/i18n/settings";
 import { useTranslation } from "@/hooks/useTranslation";
+import Link from "next/link";
 
 export default function LoginPage({
   params,
@@ -19,6 +20,7 @@ export default function LoginPage({
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const router = useRouter();
 
   // Funzione per generare un nickname unico che non sia già in uso
@@ -49,10 +51,17 @@ export default function LoginPage({
   };
 
   // Handle form submission for both login and signup
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    
+    // Verifica che l'utente abbia accettato l'informativa privacy se sta registrandosi
+    if (!isLogin && !privacyAccepted) {
+      setError(t("login.error.privacyRequired"));
+      return;
+    }
+    
+    setLoading(true);
 
     try {
       if (isLogin) {
@@ -202,6 +211,30 @@ export default function LoginPage({
                   />
                 </div>
               </div>
+
+              {/* Checkbox per l'informativa privacy (mostrata solo durante la registrazione) */}
+              {!isLogin && (
+                <div className="flex items-start mt-4">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="privacy-policy"
+                      name="privacy-policy"
+                      type="checkbox"
+                      checked={privacyAccepted}
+                      onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label htmlFor="privacy-policy" className="font-medium text-gray-700">
+                      {t("login.privacyConsent")}{" "}
+                      <Link href='https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf' target="_blank" className="text-indigo-600 hover:text-indigo-500">
+                        {t("login.privacyPolicy")}
+                      </Link>
+                    </label>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <button

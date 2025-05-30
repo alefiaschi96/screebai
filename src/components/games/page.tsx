@@ -21,9 +21,9 @@ export default function GamesPage({
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/login");
+      router.push(`/${locale}/login`);
     }
-  }, [isLoading, isAuthenticated, router, user, userScore]);
+  }, [isLoading, isAuthenticated, router, user, userScore, locale]);
 
   // Show loading state
   if (isLoading) {

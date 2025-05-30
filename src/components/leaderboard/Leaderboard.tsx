@@ -19,11 +19,15 @@ export default function Leaderboard({ locale }: { locale: Locale }) {
   const { userScore } = useAuth();
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  const fetchLeaderboard = useCallback(async () => {
-    setLoading(true);
+  /**
+   * Recupera la classifica completa da Supabase
+   */
+  const fetchFullLeaderboard = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("scores")
@@ -31,58 +35,164 @@ export default function Leaderboard({ locale }: { locale: Locale }) {
         .order("score", { ascending: false });
 
       if (error) throw error;
-
-      const leaderboardData: LeaderboardEntry[] = data.map((entry, index) => ({
+      
+      // Mappa i dati e assegna le posizioni
+      return data.map((entry, index) => ({
         ...entry,
         position: index + 1,
       }));
+    } catch (err) {
+      console.error("Error fetching full leaderboard:", err);
+      throw err;
+    }
+  }, []);
 
-      let displayedData;
-
-      if (!userScore) {
-        displayedData = leaderboardData.slice(0, 5);
-      } else {
-        const userPosition = leaderboardData.findIndex((e) => e.user_id === userScore.user_id);
-
-        if (userPosition === -1 || userPosition < 2) {
-          displayedData = leaderboardData.slice(0, 5);
-        } else {
-          const start = Math.max(0, userPosition - 1);
-          const end = Math.min(leaderboardData.length, userPosition + 2);
-          displayedData = [
-            ...leaderboardData.slice(0, 2),
-            ...leaderboardData.slice(start, end),
-          ];
-          displayedData = Array.from(new Set(displayedData));
-        }
+  /**
+   * Recupera la classifica da Supabase con possibilità di filtrare per nome
+   * @param search Termine di ricerca opzionale per filtrare i risultati
+   */
+  const fetchLeaderboard = useCallback(async (search?: string) => {
+    if (search) {
+      setIsSearching(true);
+    } else {
+      setLoading(true);
+    }
+    setError(null);
+    
+    try {
+      // Prima otteniamo la classifica completa per avere le posizioni corrette
+      const fullLeaderboard = await fetchFullLeaderboard();
+      
+      // Se non c'è un termine di ricerca, mostriamo la classifica completa
+      if (!search || search.trim() === "") {
+        setLeaderboard(fullLeaderboard);
+        return;
       }
-
-      setLeaderboard(displayedData);
+      
+      // Filtriamo la classifica completa per nome, mantenendo le posizioni originali
+      const filteredData = fullLeaderboard.filter(entry => 
+        entry.user_nick.toLowerCase().includes(search.trim().toLowerCase())
+      );
+      
+      setLeaderboard(filteredData);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError(t("leaderboard.fetchError"));
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
-  }, [userScore, t]);
+  }, [t]);
 
+  // Carica la classifica all'avvio
   useEffect(() => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
+  
+  // Gestisce il cambiamento nel campo di ricerca con debounce
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Utilizziamo un timeout per evitare troppe chiamate API mentre l'utente digita
+    const debounceTimeout = setTimeout(() => {
+      fetchLeaderboard(value);
+    }, 500); // Aspetta 500ms dopo l'ultima digitazione
+    
+    // Pulizia del timeout se l'utente digita ancora prima che scada
+    return () => clearTimeout(debounceTimeout);
+  };
+  
+  // Gestisce il click sul pulsante di ricerca
+  const handleSearchClick = () => {
+    fetchLeaderboard(searchTerm);
+  };
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center mb-4 gap-3 pt-3">
         <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b]">
           {t("common.leaderboard")}
         </span>
-      </div>
-
-      {error && (
-        <div className="bg-red-900 bg-opacity-20 border-l-4 border-red-600 p-4 mb-4 rounded">
-          <p className="text-sm text-red-400">{error}</p>
+        
+        <div className="flex-grow">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg 
+                className="h-5 w-5 text-gray-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()}
+              placeholder={t("leaderboard.searchPlaceholder")}
+              className="w-full pl-10 pr-4 py-2 border border-[#334155] rounded-md bg-[#1e293b] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
+            />
+          </div>
         </div>
-      )}
+        
+        <div className="flex space-x-2">
+          <button
+            onClick={handleSearchClick}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-[#1e293b] hover:bg-[#2d3748] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            disabled={isSearching}
+          >
+            <svg
+              className="mr-1 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            {t("leaderboard.search")}
+          </button>
+          
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              fetchLeaderboard();
+            }}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-[#1e293b] hover:bg-[#2d3748] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            disabled={loading}
+          >
+            <svg
+              className="mr-1 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {t("leaderboard.refresh")}
+          </button>
+        </div>
+      </div>
 
       <div className="space-y-2 overflow-y-auto flex-grow pb-2 px-1">
         {leaderboard.map((entry) => (
@@ -119,23 +229,34 @@ export default function Leaderboard({ locale }: { locale: Locale }) {
               {entry.user_nick}
               {userScore?.user_id === entry.user_id && " (Tu)"}
             </div>
-            <div className="flex-shrink-0 font-bold text-xl" style={{ color: "#64748b" }}>
+            <div
+              className="flex-shrink-0 font-bold text-xl"
+              style={{ color: "#64748b" }}
+            >
               {entry.score}
             </div>
           </div>
         ))}
       </div>
 
-      {loading && (
-        <div className="flex justify-center my-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#6366f1]"></div>
+      {(loading || isSearching) ? (
+        <div className="flex-grow flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6366f1]"></div>
         </div>
-      )}
-
-      {!loading && leaderboard.length === 0 && !error && (
-        <div className="text-center py-4 text-gray-400">
-          {t("leaderboard.noData")}
+      ) : error ? (
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-red-500">{error}</div>
         </div>
+      ) : leaderboard.length === 0 ? (
+        <div className="flex-grow flex items-center justify-center">
+          {searchTerm ? (
+            <div className="text-gray-500">{t("leaderboard.noResults")}</div>
+          ) : (
+            <div className="text-gray-500">{t("leaderboard.noData")}</div>
+          )}
+        </div>
+      ) : (
+        <></>
       )}
     </div>
   );

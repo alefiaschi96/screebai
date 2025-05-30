@@ -31,13 +31,16 @@
     "register": "Register",
     "forgotPassword": "Forgot your password?",
     "loading": "Loading...",
+    "privacyConsent": "I have read and accept the",
+    "privacyPolicy": "privacy policy",
     "promo": {
       "title": "Challenge AI with our mini-games.",
       "description": "Visit the Codeploy stand to discover your ranking position and get a surprise!"
     },
     "error": {
       "generic": "An error occurred",
-      "emailExists": "An account with this email already exists"
+      "emailExists": "An account with this email already exists",
+      "privacyRequired": "You must accept the privacy policy to register"
     }
   },
   "home": {
@@ -59,9 +62,16 @@
     }
   },
   "leaderboard": {
+    "title": "Leaderboard",
+    "description": "Discover the best CoGames players!",
     "yourPosition": "Your position",
+    "yourScore": "Your score",
     "refresh": "Refresh",
-    "noData": "No data available"
+    "noData": "No data available",
+    "noResults": "No player found with this name",
+    "searchPlaceholder": "Search player...",
+    "search": "Search",
+    "fetchError": "Error loading the leaderboard"
   },
   "screebai": {
     "wordToDraw": "Word to draw",

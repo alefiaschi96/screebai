@@ -1,11 +1,10 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Leaderboard from "@/components/leaderboard/Leaderboard";
 import { Locale } from "@/i18n/settings";
 import { use } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function LeaderboardPage({
   params,
@@ -13,15 +12,8 @@ export default function LeaderboardPage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = use(params);
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isLoading, isAuthenticated, router]);
+  const { t } = useTranslation(locale);
+  const { isLoading } = useAuth();
 
   // Show loading state
   if (isLoading) {
@@ -32,13 +24,16 @@ export default function LeaderboardPage({
     );
   }
 
-  // Show page only if authenticated
-  if (!isAuthenticated) {
-    return null; // Will redirect to login via useEffect
-  }
-
   return (
     <div className="container mx-auto px-4 py-4 h-full flex flex-col bg-[#0f172a]">
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+          {t("leaderboard.title")}
+        </h1>
+        <p className="text-gray-400">
+          {t("leaderboard.description")}
+        </p>
+      </div>
       <div className="flex-grow overflow-hidden rounded-lg">
         <Leaderboard locale={locale} />
       </div>
