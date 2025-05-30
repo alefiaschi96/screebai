@@ -223,7 +223,7 @@ const CoCatch = () => {
       // Mostra la prossima immagine dopo un breve ritardo
       setTimeout(() => {
         if (gameActiveRef.current) showRandomImage();
-      }, 400);
+      }, 500);
     }, IMAGE_DURATION);
   };
 

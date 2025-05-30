@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Locale, i18n } from "@/i18n/settings";
+import { useLocale } from "@/hooks/useLocale";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -10,19 +10,12 @@ import LanguageSwitcher from "./LanguageSwitcher";
 export default function Navbar() {
   const { user, signOut, isLoading, userScore } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [locale, setLocale] = useState<Locale>(i18n.defaultLocale as Locale);
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { currentLocale: locale } = useLocale();
 
   const pendingHref = useRef<string | null>(null);
-
-  useEffect(() => {
-    const pathnameLocale = pathname?.split("/")[1];
-    if (pathnameLocale && i18n.locales.includes(pathnameLocale as Locale)) {
-      setLocale(pathnameLocale as Locale);
-    }
-  }, [pathname]);
 
   useEffect(() => {
     if (isNavigating && pendingHref.current && pathname === pendingHref.current) {
@@ -36,6 +29,12 @@ export default function Navbar() {
     if (href !== pathname) {
       setIsNavigating(true);
       pendingHref.current = href;
+      
+      // Assicuriamoci che l'href contenga sempre la lingua corrente
+      if (!href.startsWith(`/${locale}`)) {
+        href = `/${locale}${href.startsWith('/') ? href : `/${href}`}`;
+      }
+      
       router.push(href);
     } else {
       setIsMenuOpen(false);

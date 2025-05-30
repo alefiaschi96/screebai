@@ -50,7 +50,7 @@ export default function GamesPage({
       <div className="grid grid-cols-2 gap-4">
         {/* Gioco 1 - Disegno (già sviluppato) */}
         <div className="bg-[#2a3b52] rounded-2xl overflow-hidden transition-all hover:bg-[#334155]">
-          <Link href="/screebai" className="block">
+          <Link href={`/${locale}/screebai`} className="block">
             <div className="flex items-center p-4">
               <div
                 className="hidden md:flex w-12 h-12 rounded-full items-center justify-center mr-3"
@@ -85,7 +85,7 @@ export default function GamesPage({
 
         {/* CoCatch */}
         <div className="bg-[#2a3b52] rounded-2xl overflow-hidden transition-all hover:bg-[#334155]">
-          <Link href="/cocatch" className="block">
+          <Link href={`/${locale}/cocatch`} className="block">
             <div className="flex items-center p-4">
               <div
                 className="hidden md:flex w-12 h-12 rounded-full items-center justify-center mr-3"

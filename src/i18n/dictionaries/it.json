@@ -31,6 +31,10 @@
     "register": "Registrati",
     "forgotPassword": "Hai dimenticato la password?",
     "loading": "Caricamento...",
+    "promo": {
+      "title": "Sfida l'AI con i nostri mini-giochi.",
+      "description": "Passa allo stand di Codeploy per scoprire il tuo posto in classifica e ritirare una sorpresa!"
+    },
     "error": {
       "generic": "Si è verificato un errore",
       "emailExists": "Esiste già un account con questa email"

@@ -31,6 +31,10 @@
     "register": "Register",
     "forgotPassword": "Forgot your password?",
     "loading": "Loading...",
+    "promo": {
+      "title": "Challenge AI with our mini-games.",
+      "description": "Visit the Codeploy stand to discover your ranking position and get a surprise!"
+    },
     "error": {
       "generic": "An error occurred",
       "emailExists": "An account with this email already exists"
