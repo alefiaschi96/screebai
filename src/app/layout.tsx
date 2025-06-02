@@ -40,9 +40,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f172a] text-white`}
       >
         <AuthProvider>
-          <div className="flex flex-col h-screen">
+          <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-grow overflow-hidden">{children}</main>
+            <main className="flex-grow overflow-y-auto">{children}</main>
           </div>
         </AuthProvider>
       </body>
