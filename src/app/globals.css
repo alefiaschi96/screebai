@@ -34,11 +34,12 @@ body {
   overscroll-behavior: none; /* Prevent bounce effect on mobile */
   touch-action: manipulation; /* Optimize for touch */
   -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Stili per i titoli come in Codeploy */
