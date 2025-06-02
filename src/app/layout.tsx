@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/navbar/Navbar";
@@ -45,6 +46,11 @@ export default function RootLayout({
             <main className="flex-grow overflow-y-auto">{children}</main>
           </div>
         </AuthProvider>
+        <Script
+          src="//cdn.cookie-script.com/s/b931bc6491cc59d879c3516b5c342fd9.js"
+          strategy="afterInteractive"
+          id="cookie-script"
+        />
       </body>
     </html>
   );
