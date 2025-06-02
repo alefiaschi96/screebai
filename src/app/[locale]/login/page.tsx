@@ -257,7 +257,7 @@ export default function LoginPage({
                       >
                         {t("login.privacyConsent")}{" "}
                         <Link
-                          href="https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf"
+                          href="https://www.codeploy.it/wp-content/uploads/2025/06/Informativa_privacy_CoGames.pdf"
                           target="_blank"
                           className="text-indigo-600 hover:text-indigo-500"
                         >
@@ -284,7 +284,7 @@ export default function LoginPage({
                       >
                         {t("login.marketingConsent")}{" "}
                         <Link
-                          href="https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf"
+                          href="https://www.codeploy.it/wp-content/uploads/2025/06/Informativa_privacy_CoGames.pdf"
                           target="_blank"
                           className="text-indigo-600 hover:text-indigo-500"
                         >

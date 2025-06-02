@@ -49,16 +49,25 @@ const ScreebaiCanvas = ({ onSubmit, setCanvasRef }: DrawingCanvasProps) => {
           // Calcola l'altezza della barra degli strumenti in base alla dimensione dello schermo
           const isMobile = window.innerWidth < 640;
           
-          // Calcoliamo l'altezza del contenitore e la usiamo direttamente
-          // Questo assicura che il canvas occupi tutto lo spazio disponibile
-          const width = containerRect.width;
-          const height = containerRect.height;
+          // Assicuriamo che il container abbia un'altezza minima
+          if (containerRect.height < 300) {
+            container.style.minHeight = '60vh';
+          }
           
-          setCanvasSize({ width, height });
+          // Rileggi le dimensioni dopo aver impostato l'altezza minima
+          const updatedRect = container.getBoundingClientRect();
+          const width = updatedRect.width;
+          const height = updatedRect.height;
+          
+          // Imposta dimensioni minime per il canvas
+          const finalWidth = Math.max(width, 300);
+          const finalHeight = Math.max(height, 300);
+          
+          setCanvasSize({ width: finalWidth, height: finalHeight });
           
           // Set canvas dimensions
-          canvasRef.current.width = width;
-          canvasRef.current.height = height;
+          canvasRef.current.width = finalWidth;
+          canvasRef.current.height = finalHeight;
           
           // Applica uno stile di bordo più sottile su mobile
           if (isMobile) {
@@ -191,7 +200,7 @@ const ScreebaiCanvas = ({ onSubmit, setCanvasRef }: DrawingCanvasProps) => {
   return (
     <div className="flex flex-col h-full w-full mt-1 pt-0">
       {/* Drawing area */}
-      <div className="flex-grow relative border border-[#334155] rounded-2xl overflow-hidden bg-white">
+      <div className="flex-grow relative border border-[#334155] rounded-2xl overflow-hidden bg-white" style={{ minHeight: '60vh' }}>
         <canvas
           ref={canvasRef}
           width={canvasSize.width}

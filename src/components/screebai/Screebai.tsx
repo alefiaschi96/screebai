@@ -169,6 +169,7 @@ const ScreebAi = () => {
           if (newAttempts >= MAX_ATTEMPTS) {
             updateUserScore(scoreRef.current);
             setGameOver(true);
+            setGameStarted(false);
           } else {
             startNewRound();
           }
@@ -311,7 +312,7 @@ const ScreebAi = () => {
       )}
 
       {gameOver ? (
-        <div className="flex flex-col items-center justify-center flex-grow text-center">
+        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             {t("screebai.gameOver")}
           </h2>
@@ -326,7 +327,7 @@ const ScreebAi = () => {
           </button>
         </div>
       ) : !gameStarted ? (
-        <div className="flex flex-col items-center justify-center flex-grow text-center px-2">
+        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             {t("screebai.drawAndGuess")}
           </h2>
@@ -394,7 +395,7 @@ const ScreebAi = () => {
             </div>
           </div>
 
-          <div className="flex-grow pb-14 sm:pb-12 md:pb-0 h-full">
+          <div className="flex-grow pb-14 sm:pb-12 md:pb-0 h-full" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column' }}>
             <ScreebaiCanvas
               onSubmit={handleSubmit}
               setCanvasRef={setCanvasRef}

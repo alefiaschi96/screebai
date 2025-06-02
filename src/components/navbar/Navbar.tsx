@@ -116,24 +116,26 @@ export default function Navbar() {
 
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
-            {/* <button
-              onClick={() => handleNav(`/${locale}/leaderboard`)}
-              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
-            >
-              <svg
-                className="mr-1 h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+            {user?.email && user.email.includes('@codeploy') && (
+              <button
+                onClick={() => handleNav(`/${locale}/leaderboard`)}
+                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {t("navbar.leaderboard")}
-            </button> */}
+                <svg
+                  className="mr-1 h-4 w-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {t("navbar.leaderboard")}
+              </button>
+            )}
 
             {/* Menu button */}
             <button
@@ -270,24 +272,26 @@ export default function Navbar() {
                           </svg>
                         </button>
 
-                        {/* <button
-                          onClick={() => handleNav(`/${locale}/leaderboard`)}
-                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
-                        >
-                          <span className="text-white">{t("navbar.leaderboard")}</span>
-                          <svg
-                            className="h-5 w-5 text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
+                        {user?.email && user.email.includes('@codeploy') && (
+                          <button
+                            onClick={() => handleNav(`/${locale}/leaderboard`)}
+                            className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                           >
-                            <path
-                              fillRule="evenodd"
-                              d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button> */}
+                            <span className="text-white">{t("navbar.leaderboard")}</span>
+                            <svg
+                              className="h-5 w-5 text-gray-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        )}
 
                         {/* Language switcher */}
                         <div className="bg-[#1e293b] rounded-lg p-3 border border-[#334155]">

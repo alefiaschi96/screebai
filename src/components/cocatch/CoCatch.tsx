@@ -310,7 +310,7 @@ const CoCatch = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full w-full p-1 sm:p-2 md:p-6">
+    <div className="flex flex-col h-full w-full p-1 sm:p-2 md:p-4">
       {/* Game stats */}
       {gameStarted && (
         <div
@@ -331,7 +331,7 @@ const CoCatch = () => {
 
       {/* Game over screen */}
       {gameOver ? (
-        <div className="flex flex-col items-center justify-center flex-grow text-center">
+        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             {t("cocatch.gameOver")}
           </h2>
@@ -346,7 +346,7 @@ const CoCatch = () => {
           </button>
         </div>
       ) : !gameStarted ? (
-        <div className="flex flex-col items-center justify-center flex-grow text-center px-2">
+        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             {t("cocatch.catchImages")}
           </h2>
@@ -368,10 +368,11 @@ const CoCatch = () => {
         <div
           ref={gameAreaRef}
           className="flex-grow relative bg-[#1e293b] rounded-2xl overflow-hidden"
-          style={{ 
-            minHeight: "300px", 
-            maxHeight: "calc(80vh - 100px)", 
-            height: "calc(100% - 20px)" 
+          style={{
+            minHeight: "300px",
+            height: "calc(90vh - 120px)", /* 90% della viewport meno lo spazio per header/punteggio */
+            width: "100%",
+            margin: "0 auto",
           }}
         >
           {currentImage && (
