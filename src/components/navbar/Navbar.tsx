@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLocale } from "@/hooks/useLocale";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -18,7 +19,11 @@ export default function Navbar() {
   const pendingHref = useRef<string | null>(null);
 
   useEffect(() => {
-    if (isNavigating && pendingHref.current && pathname === pendingHref.current) {
+    if (
+      isNavigating &&
+      pendingHref.current &&
+      pathname === pendingHref.current
+    ) {
       setIsMenuOpen(false);
       setIsNavigating(false);
       pendingHref.current = null;
@@ -29,12 +34,12 @@ export default function Navbar() {
     if (href !== pathname) {
       setIsNavigating(true);
       pendingHref.current = href;
-      
+
       // Assicuriamoci che l'href contenga sempre la lingua corrente
       if (!href.startsWith(`/${locale}`)) {
-        href = `/${locale}${href.startsWith('/') ? href : `/${href}`}`;
+        href = `/${locale}${href.startsWith("/") ? href : `/${href}`}`;
       }
-      
+
       router.push(href);
     } else {
       setIsMenuOpen(false);
@@ -44,7 +49,7 @@ export default function Navbar() {
   const { t } = useTranslation(locale);
 
   return (
-    <nav className="bg-[#0f172a] border-b border-[#334155]">
+    <nav className="bg-[#0f172a] border-b border-[#334155] z-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           <div className="flex">
@@ -53,6 +58,13 @@ export default function Navbar() {
                 onClick={() => handleNav(`/${locale}`)}
                 className="flex items-center focus:outline-none"
               >
+                <Image
+                  src="/images/logo_512.png"
+                  alt="Cogames Logo"
+                  width={32}
+                  height={32}
+                  className="mr-2"
+                />
                 <span className="text-xl sm:text-2xl font-bold text-[#f59e0b]">
                   <span className="text-[#6366f1]">Co</span>games
                 </span>
@@ -172,13 +184,28 @@ export default function Navbar() {
 
       {/* Mobile menu, show/hide based on menu state */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 sm:hidden bg-[#0f172a]">
-          <div className="flex flex-col h-full">
+        <div
+          className="fixed inset-0 z-[100] sm:hidden bg-[#0f172a] overflow-auto"
+          style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="flex flex-col h-full w-full">
             {/* Menu header with close button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#334155]">
-              <div className="font-bold text-xl" onClick={() => handleNav(`/${locale}`)}>
-                <span className="text-[#6366f1]">Co</span>
-                <span className="text-[#f59e0b]">games</span>
+              <div
+                className="font-bold text-xl flex items-center"
+                onClick={() => handleNav(`/${locale}`)}
+              >
+                <Image
+                  src="/images/logo_512.png"
+                  alt="Cogames Logo"
+                  width={32}
+                  height={32}
+                  className="mr-2"
+                />
+                <div>
+                  <span className="text-[#6366f1]">Co</span>
+                  <span className="text-[#f59e0b]">games</span>
+                </div>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}

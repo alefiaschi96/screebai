@@ -368,7 +368,11 @@ const CoCatch = () => {
         <div
           ref={gameAreaRef}
           className="flex-grow relative bg-[#1e293b] rounded-2xl overflow-hidden"
-          style={{ minHeight: "300px" }}
+          style={{ 
+            minHeight: "300px", 
+            maxHeight: "calc(80vh - 100px)", 
+            height: "calc(100% - 20px)" 
+          }}
         >
           {currentImage && (
             <div

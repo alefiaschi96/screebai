@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { generateNickname } from "@/data/nicknames";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,7 @@ export default function LoginPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [marketingAccepted, setMarketingAccepted] = useState(false);
   const router = useRouter();
 
   // Funzione per generare un nickname unico che non sia già in uso
@@ -54,13 +56,13 @@ export default function LoginPage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    
+
     // Verifica che l'utente abbia accettato l'informativa privacy se sta registrandosi
     if (!isLogin && !privacyAccepted) {
       setError(t("login.error.privacyRequired"));
       return;
     }
-    
+
     setLoading(true);
 
     try {
@@ -83,6 +85,12 @@ export default function LoginPage({
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              consent_service: privacyAccepted,
+              consent_marketing: marketingAccepted,
+            },
+          },
         });
 
         if (error) throw error;
@@ -102,10 +110,7 @@ export default function LoginPage({
             ]);
 
             if (scoreError) {
-              console.error(
-                t("errors.scoreCreation") + ":",
-                scoreError
-              );
+              console.error(t("errors.scoreCreation") + ":", scoreError);
             }
           }
         }
@@ -121,9 +126,20 @@ export default function LoginPage({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2 sm:p-6 lg:p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2 sm:p-6 lg:p-8 relative" style={{ zIndex: 1 }}>
+      {/* Immagine di sfondo visibile solo su desktop */}
+      <div className="block absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <Image
+          src="/images/08-min.png"
+          alt="Background"
+          width={1200}
+          height={800}
+          className="object-contain w-full h-full opacity-20 -translate-y-10"
+          priority
+        />
+      </div>
       {/* Contenitore principale diviso in due colonne */}
-      <div className="w-full max-w-7xl flex flex-col sm:flex-row md:shadow-xl rounded-xl overflow-hidden my-auto">
+      <div className="w-full max-w-7xl flex flex-col sm:flex-row md:shadow-xl rounded-xl overflow-hidden my-auto relative z-10">
         {/* Colonna sinistra con il testo promozionale - visibile solo su desktop */}
         <div className="hidden sm:flex w-1/2 bg-indigo-600 text-white p-8 sm:p-10 lg:p-12 items-center justify-center">
           <div className="text-center space-y-6 lg:space-y-8">
@@ -133,8 +149,16 @@ export default function LoginPage({
             <p className="text-xl md:text-2xl lg:text-3xl">
               {t("login.promo.description").split(" ").length > 8 ? (
                 <>
-                  {t("login.promo.description").split(" ").slice(0, 5).join(" ")}<br />
-                  {t("login.promo.description").split(" ").slice(5, 11).join(" ")}<br />
+                  {t("login.promo.description")
+                    .split(" ")
+                    .slice(0, 5)
+                    .join(" ")}
+                  <br />
+                  {t("login.promo.description")
+                    .split(" ")
+                    .slice(5, 11)
+                    .join(" ")}
+                  <br />
                   {t("login.promo.description").split(" ").slice(11).join(" ")}
                 </>
               ) : (
@@ -143,7 +167,7 @@ export default function LoginPage({
             </p>
           </div>
         </div>
-        
+
         {/* Colonna destra con il form di login/registrazione */}
         <div className="w-full sm:w-1/2 p-6 sm:p-8 lg:p-10">
           {/* Solo per mobile: testo promozionale in cima */}
@@ -155,7 +179,7 @@ export default function LoginPage({
               {t("login.promo.description")}
             </p>
           </div>
-          
+
           <div className="max-w-md mx-auto space-y-6">
             <div>
               <h3 className="text-center text-xl sm:text-3xl font-extrabold text-gray-900 mb-2 text-black">
@@ -214,26 +238,62 @@ export default function LoginPage({
 
               {/* Checkbox per l'informativa privacy (mostrata solo durante la registrazione) */}
               {!isLogin && (
-                <div className="flex items-start mt-4">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="privacy-policy"
-                      name="privacy-policy"
-                      type="checkbox"
-                      checked={privacyAccepted}
-                      onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                    />
+                <>
+                  <div className="flex items-start mt-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="privacy-policy"
+                        name="privacy-policy"
+                        type="checkbox"
+                        checked={privacyAccepted}
+                        onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="privacy-policy"
+                        className="font-medium text-gray-700"
+                      >
+                        {t("login.privacyConsent")}{" "}
+                        <Link
+                          href="https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf"
+                          target="_blank"
+                          className="text-indigo-600 hover:text-indigo-500"
+                        >
+                          {t("login.privacyPolicy")}
+                        </Link>
+                      </label>
+                    </div>
                   </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="privacy-policy" className="font-medium text-gray-700">
-                      {t("login.privacyConsent")}{" "}
-                      <Link href='https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf' target="_blank" className="text-indigo-600 hover:text-indigo-500">
-                        {t("login.privacyPolicy")}
-                      </Link>
-                    </label>
+                  <div className="flex items-start mt-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="privacy-policy"
+                        name="privacy-policy"
+                        type="checkbox"
+                        checked={marketingAccepted}
+                        onChange={(e) => setMarketingAccepted(e.target.checked)}
+                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="privacy-policy"
+                        className="font-medium text-gray-700"
+                      >
+                        {t("login.marketingConsent")}{" "}
+                        <Link
+                          href="https://dma3sqtfdohvv.cloudfront.net/pdf/Informativa_privacy_CoGames.pdf"
+                          target="_blank"
+                          className="text-indigo-600 hover:text-indigo-500"
+                        >
+                          {t("login.privacyPolicy")}
+                        </Link>
+                      </label>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div>

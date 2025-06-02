@@ -31,7 +31,8 @@
     "register": "Registrati",
     "forgotPassword": "Hai dimenticato la password?",
     "loading": "Caricamento...",
-    "privacyConsent": "Ho letto e accetto l'",
+    "privacyConsent": "Acconsento al trattamento necessario all'erogazione del servizio",
+    "marketingConsent": "Acconsento al trattamento per finalità di marketing",
     "privacyPolicy": "informativa sulla privacy",
     "promo": {
       "title": "Sfida l'AI con i nostri mini-giochi.",
@@ -40,14 +41,16 @@
     "error": {
       "generic": "Si è verificato un errore",
       "emailExists": "Esiste già un account con questa email",
-      "privacyRequired": "Devi accettare l'informativa sulla privacy per registrarti"
+      "privacyRequired": "Devi accettare il trattamento per l'erogazione del servizio per registrarti"
     }
   },
   "home": {
     "hello": "Ciao",
-    "welcome1": "Benvenuto in CoGames. Attualmente hai",
-    "welcome2": "in classifica",
-    "points": "punti"
+    "welcome1": "Hai accumulato",
+    "welcome2": "finora. Continua a giocare per aumentare il tuo punteggio!",
+    "points": "punti",
+    "gadgetMessage1": "Ottimo punteggio! 🚀",
+    "gadgetMessage2": "Ancora un passo — clicca qui per compilare il modulo e ritirare i tuoi gadget allo stand di Codeploy!"
   },
   "games": {
     "title": "Giochi",
