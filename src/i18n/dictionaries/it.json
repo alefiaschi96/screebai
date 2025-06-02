@@ -31,16 +31,26 @@
     "register": "Registrati",
     "forgotPassword": "Hai dimenticato la password?",
     "loading": "Caricamento...",
+    "privacyConsent": "Acconsento al trattamento necessario all'erogazione del servizio",
+    "marketingConsent": "Acconsento al trattamento per finalità di marketing",
+    "privacyPolicy": "informativa sulla privacy",
+    "promo": {
+      "title": "Sfida l'AI con i nostri mini-giochi.",
+      "description": "Passa allo stand di Codeploy per scoprire il tuo posto in classifica e ritirare una sorpresa!"
+    },
     "error": {
       "generic": "Si è verificato un errore",
-      "emailExists": "Esiste già un account con questa email"
+      "emailExists": "Esiste già un account con questa email",
+      "privacyRequired": "Devi accettare il trattamento per l'erogazione del servizio per registrarti"
     }
   },
   "home": {
     "hello": "Ciao",
-    "welcome1": "Benvenuto in CoGames. Attualmente hai",
-    "welcome2": "in classifica",
-    "points": "punti"
+    "welcome1": "Hai accumulato",
+    "welcome2": "finora. Continua a giocare per aumentare il tuo punteggio!",
+    "points": "punti",
+    "gadgetMessage1": "Ottimo punteggio! 🚀",
+    "gadgetMessage2": "Ancora un passo — clicca qui per compilare il modulo e ritirare i tuoi gadget allo stand di Codeploy!"
   },
   "games": {
     "title": "Giochi",
@@ -55,9 +65,16 @@
     }
   },
   "leaderboard": {
+    "title": "Classifica",
+    "description": "Scopri chi sono i migliori giocatori di CoGames!",
     "yourPosition": "La tua posizione",
+    "yourScore": "Il tuo punteggio",
     "refresh": "Aggiorna",
-    "noData": "Nessun dato disponibile"
+    "noData": "Nessun dato disponibile",
+    "noResults": "Nessun giocatore trovato con questo nome",
+    "searchPlaceholder": "Cerca giocatore...",
+    "search": "Cerca",
+    "fetchError": "Errore durante il caricamento della classifica"
   },
   "screebai": {
     "wordToDraw": "Parola da disegnare",

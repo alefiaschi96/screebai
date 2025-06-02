@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Session, User } from "@supabase/supabase-js";
+import { useLocale } from "@/hooks/useLocale";
 
 type UserScore = {
   id: number;
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userScore, setUserScore] = useState<UserScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { currentLocale } = useLocale();
 
   // Funzione per recuperare il punteggio dell'utente
   const fetchUserScore = async (userId: string) => {
@@ -171,7 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setUserScore(null);
       setSession(null);
-      router.push("/login");
+      router.push(`/${currentLocale}/login`);
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {

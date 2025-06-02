@@ -1,31 +1,25 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { i18n, Locale } from "@/i18n/settings";
-import { getPathWithNewLocale } from "@/i18n/navigation";
 import { useState } from "react";
+import { useLocale } from "@/hooks/useLocale";
 
 type LanguageSwitcherProps = {
   isMobile?: boolean;
 };
 
 export default function LanguageSwitcher({ isMobile = false }: LanguageSwitcherProps) {
-  const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { currentLocale, changeLocale } = useLocale();
 
-  // Determina la lingua corrente dal pathname
-  const currentLocale = pathname.split("/")[1] as Locale;
-
-  // Cambia la lingua e naviga alla stessa pagina con la nuova lingua
+  // Cambia la lingua utilizzando l'hook useLocale
   const switchLanguage = (newLocale: Locale) => {
     if (newLocale === currentLocale) {
       setIsOpen(false);
       return;
     }
 
-    const newPath = getPathWithNewLocale(pathname, newLocale);
-    router.push(newPath);
+    changeLocale(newLocale);
     setIsOpen(false);
   };
 

@@ -4,17 +4,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import CoCatch from "@/components/cocatch/CoCatch";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function Cocatch() {
   const { user, userScore, isAuthenticated, isLoading } = useAuth();
+  const { currentLocale: locale } = useLocale();
   const router = useRouter();
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/login");
+      router.push(`/${locale}/login`);
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, router, locale]);
 
   // Show loading state
   if (isLoading) {

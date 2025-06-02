@@ -2,30 +2,28 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Locale, i18n } from "@/i18n/settings";
+import { useLocale } from "@/hooks/useLocale";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const { user, signOut, isLoading, userScore } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [locale, setLocale] = useState<Locale>(i18n.defaultLocale as Locale);
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { currentLocale: locale } = useLocale();
 
   const pendingHref = useRef<string | null>(null);
 
   useEffect(() => {
-    const pathnameLocale = pathname?.split("/")[1];
-    if (pathnameLocale && i18n.locales.includes(pathnameLocale as Locale)) {
-      setLocale(pathnameLocale as Locale);
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    if (isNavigating && pendingHref.current && pathname === pendingHref.current) {
+    if (
+      isNavigating &&
+      pendingHref.current &&
+      pathname === pendingHref.current
+    ) {
       setIsMenuOpen(false);
       setIsNavigating(false);
       pendingHref.current = null;
@@ -36,6 +34,12 @@ export default function Navbar() {
     if (href !== pathname) {
       setIsNavigating(true);
       pendingHref.current = href;
+
+      // Assicuriamoci che l'href contenga sempre la lingua corrente
+      if (!href.startsWith(`/${locale}`)) {
+        href = `/${locale}${href.startsWith("/") ? href : `/${href}`}`;
+      }
+
       router.push(href);
     } else {
       setIsMenuOpen(false);
@@ -45,7 +49,7 @@ export default function Navbar() {
   const { t } = useTranslation(locale);
 
   return (
-    <nav className="bg-[#0f172a] border-b border-[#334155]">
+    <nav className="bg-[#0f172a] border-b border-[#334155] z-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           <div className="flex">
@@ -54,6 +58,13 @@ export default function Navbar() {
                 onClick={() => handleNav(`/${locale}`)}
                 className="flex items-center focus:outline-none"
               >
+                <Image
+                  src="/images/logo_512.png"
+                  alt="Cogames Logo"
+                  width={32}
+                  height={32}
+                  className="mr-2"
+                />
                 <span className="text-xl sm:text-2xl font-bold text-[#f59e0b]">
                   <span className="text-[#6366f1]">Co</span>games
                 </span>
@@ -105,29 +116,24 @@ export default function Navbar() {
 
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
-            {!isLoading && user && (
-              <button
-                onClick={() => handleNav(`/${locale}/leaderboard`)}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
-                style={{ color: "#6366f1" }}
+            {/* <button
+              onClick={() => handleNav(`/${locale}/leaderboard`)}
+              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            >
+              <svg
+                className="mr-1 h-4 w-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-                {t("navbar.leaderboard")}
-              </button>
-            )}
+                <path
+                  fillRule="evenodd"
+                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t("navbar.leaderboard")}
+            </button> */}
 
             {/* Menu button */}
             <button
@@ -178,13 +184,28 @@ export default function Navbar() {
 
       {/* Mobile menu, show/hide based on menu state */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 sm:hidden bg-[#0f172a]">
-          <div className="flex flex-col h-full">
+        <div
+          className="fixed inset-0 z-[100] sm:hidden bg-[#0f172a] overflow-auto"
+          style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="flex flex-col h-full w-full">
             {/* Menu header with close button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#334155]">
-              <div className="font-bold text-xl" onClick={() => handleNav(`/${locale}`)}>
-                <span className="text-[#6366f1]">Co</span>
-                <span className="text-[#f59e0b]">games</span>
+              <div
+                className="font-bold text-xl flex items-center"
+                onClick={() => handleNav(`/${locale}`)}
+              >
+                <Image
+                  src="/images/logo_512.png"
+                  alt="Cogames Logo"
+                  width={32}
+                  height={32}
+                  className="mr-2"
+                />
+                <div>
+                  <span className="text-[#6366f1]">Co</span>
+                  <span className="text-[#f59e0b]">games</span>
+                </div>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -249,26 +270,24 @@ export default function Navbar() {
                           </svg>
                         </button>
 
-                        <button
+                        {/* <button
                           onClick={() => handleNav(`/${locale}/leaderboard`)}
                           className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
                         >
-                          <span className="text-white font-medium">
-                            {t("navbar.leaderboard")}
-                          </span>
+                          <span className="text-white">{t("navbar.leaderboard")}</span>
                           <svg
                             className="h-5 w-5 text-gray-400"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
                             fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               fillRule="evenodd"
-                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
                               clipRule="evenodd"
                             />
                           </svg>
-                        </button>
+                        </button> */}
 
                         {/* Language switcher */}
                         <div className="bg-[#1e293b] rounded-lg p-3 border border-[#334155]">

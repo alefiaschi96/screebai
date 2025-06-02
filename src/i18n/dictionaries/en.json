@@ -31,16 +31,26 @@
     "register": "Register",
     "forgotPassword": "Forgot your password?",
     "loading": "Loading...",
+    "privacyConsent": "I consent to the processing of my data necessary for the provision of the service",
+    "marketingConsent": "I agree to the use of my data for marketing",
+    "privacyPolicy": "privacy policy",
+    "promo": {
+      "title": "Challenge AI with our mini-games.",
+      "description": "Visit the Codeploy stand to discover your ranking position and get a surprise!"
+    },
     "error": {
       "generic": "An error occurred",
-      "emailExists": "An account with this email already exists"
+      "emailExists": "An account with this email already exists",
+      "privacyRequired": "To register, you need to accept the data processing required to use the service"
     }
   },
   "home": {
     "hello": "Hello",
     "welcome1": "Welcome to CoGames. You have currently",
     "welcome2": "in the leaderboard",
-    "points": "points"
+    "points": "points",
+    "gadgetMessage1": "Nice score! 🚀",
+    "gadgetMessage2": "Just one more step — click here to fill out the form and grab your goodies at the Codeploy stand!"
   },
   "games": {
     "title": "Games",
@@ -55,9 +65,16 @@
     }
   },
   "leaderboard": {
+    "title": "Leaderboard",
+    "description": "Discover the best CoGames players!",
     "yourPosition": "Your position",
+    "yourScore": "Your score",
     "refresh": "Refresh",
-    "noData": "No data available"
+    "noData": "No data available",
+    "noResults": "No player found with this name",
+    "searchPlaceholder": "Search player...",
+    "search": "Search",
+    "fetchError": "Error loading the leaderboard"
   },
   "screebai": {
     "wordToDraw": "Word to draw",

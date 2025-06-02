@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { getRandomWord } from "@/data/words";
-import { analyzeDrawing } from "../../services/openaiService";
-import ScreebaiCanvas from "./ScreebaiCanvas";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Locale } from "@/i18n/settings";
+import { supabase } from "@/lib/supabase";
+import { getRandomWord } from "@/data/words";
+import { analyzeDrawing } from "@/services/openaiService";
+import { uploadDrawing, deleteDrawing } from "@/services/storageService";
+import ScreebaiCanvas from "./ScreebaiCanvas";
 
 const ScreebAi = () => {
   const params = useParams();
@@ -47,6 +48,142 @@ const ScreebAi = () => {
     }
   };
 
+  // Riferimento al canvas per accedervi quando scade il timer
+  const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
+
+  // Funzione per ottenere l'immagine con sfondo bianco dal canvas
+  const getImageWithWhiteBackground = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      const ctx = canvas.getContext("2d");
+
+      if (ctx) {
+        // Crea un canvas temporaneo con sfondo bianco
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        if (tempCtx) {
+          // Riempi il canvas temporaneo con sfondo bianco
+          tempCtx.fillStyle = "white";
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+          // Disegna l'immagine originale sopra lo sfondo bianco
+          tempCtx.drawImage(canvas, 0, 0);
+
+          // Ottieni l'URL dati dal canvas temporaneo
+          return tempCanvas.toDataURL("image/png");
+        }
+      }
+
+      // Fallback al metodo standard se qualcosa va storto
+      return canvas.toDataURL("image/png");
+    },
+    []
+  );
+
+  const handleSubmit = async (imageDataUrl: string) => {
+    stopTimer();
+    setIsAnalyzing(true);
+    setShowResult(true);
+
+    try {
+      let savedImageUrl = "";
+
+      // Salva l'immagine su Supabase Storage
+      try {
+        // Salva solo se l'utente è autenticato
+        if (user) {
+          const bucketName =
+            process.env.NEXT_PUBLIC_BUCKET_IMAGES_NAME || "screebai";
+          if (!bucketName) {
+            throw new Error("Bucket name non specificato");
+          }
+          savedImageUrl = await uploadDrawing(
+            imageDataUrl,
+            wordRef.current,
+            bucketName
+          );
+
+          // Qui potresti anche salvare il riferimento all'immagine in un database
+          // Ad esempio, potresti creare una tabella 'drawings' in Supabase
+          // e salvare l'URL dell'immagine, la parola, il risultato dell'AI, ecc.
+        }
+      } catch (storageError) {
+        console.error(
+          "Errore durante il salvataggio dell'immagine:",
+          storageError
+        );
+        // Non interrompiamo il flusso del gioco se il salvataggio fallisce
+      }
+
+      try {
+        // Analizza l'immagine con OpenAI
+        // Se abbiamo un'immagine salvata, usiamo quella, altrimenti usiamo l'immagine originale
+        // Passa la locale corrente per ottenere la risposta nella lingua giusta
+        const result = await analyzeDrawing(
+          savedImageUrl || imageDataUrl,
+          locale as "it" | "en"
+        );
+        setAiResult(result);
+
+        // Verifica se la risposta è corretta
+        const isCorrect = checkMatch(result, wordRef.current);
+        if (isCorrect) {
+          scoreRef.current += POINTS_PER_ATTEMPT;
+          setScore(scoreRef.current);
+        }
+
+        // Elimina l'immagine dopo l'analisi se è stata salvata
+        if (savedImageUrl) {
+          try {
+            deleteDrawing(savedImageUrl);
+          } catch (deleteError) {
+            console.error(
+              "Errore durante l'eliminazione dell'immagine:",
+              deleteError
+            );
+            // Non interrompiamo il flusso del gioco se l'eliminazione fallisce
+          }
+        }
+      } catch (analyzeError) {
+        console.error("Errore durante l'analisi dell'immagine:", analyzeError);
+        alert("Errore durante l'analisi. Riprova.");
+
+        // Se l'analisi fallisce, eliminiamo comunque l'immagine se è stata salvata
+        if (savedImageUrl) {
+          try {
+            deleteDrawing(savedImageUrl);
+          } catch (deleteError) {
+            console.error(
+              "Errore durante l'eliminazione dell'immagine:",
+              deleteError
+            );
+          }
+        }
+      }
+
+      setAttempts((prev) => {
+        const newAttempts = prev + 1;
+        const handleEndOrNext = () => {
+          if (newAttempts >= MAX_ATTEMPTS) {
+            updateUserScore(scoreRef.current);
+            setGameOver(true);
+          } else {
+            startNewRound();
+          }
+        };
+        setTimeout(handleEndOrNext, WAIT_AFTER_RESULT);
+        return newAttempts;
+      });
+    } catch (error) {
+      console.error("Errore analisi immagine:", error);
+      alert("Errore durante l'analisi. Riprova.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const startTimer = useCallback(() => {
     setTimeLeft(MAX_TIME_PER_ATTEMPT);
     stopTimer();
@@ -57,17 +194,36 @@ const ScreebAi = () => {
           clearInterval(timerRef.current!);
           if (!isAnalyzing && !hasSubmittedRef.current) {
             hasSubmittedRef.current = true;
-            const canvas = document.querySelector(
-              "canvas"
-            ) as HTMLCanvasElement;
-            if (canvas) handleSubmit(canvas.toDataURL("image/png"));
+            
+            // Cerca il canvas nel DOM se il riferimento non è disponibile
+            const canvas = canvasRef || document.querySelector("canvas") as HTMLCanvasElement;
+            
+            if (canvas) {
+              try {
+                // Ottieni l'immagine con sfondo bianco usando la stessa logica di ScreebaiCanvas
+                const imageDataUrl = getImageWithWhiteBackground(canvas);
+                handleSubmit(imageDataUrl);
+              } catch (error) {
+                console.error("Errore durante l'acquisizione dell'immagine:", error);
+                // Fallback: invia un'immagine vuota se non riusciamo a ottenere quella dal canvas
+                const emptyCanvas = document.createElement("canvas");
+                emptyCanvas.width = 400;
+                emptyCanvas.height = 300;
+                const ctx = emptyCanvas.getContext("2d");
+                if (ctx) {
+                  ctx.fillStyle = "white";
+                  ctx.fillRect(0, 0, emptyCanvas.width, emptyCanvas.height);
+                  handleSubmit(emptyCanvas.toDataURL("image/png"));
+                }
+              }
+            }
           }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [isAnalyzing]);
+  }, [isAnalyzing, canvasRef, getImageWithWhiteBackground, handleSubmit]);
 
   const updateUserScore = async (points: number) => {
     if (!user || !userScore) return;
@@ -128,42 +284,6 @@ const ScreebAi = () => {
 
   const checkMatch = (a: string, b: string) =>
     a.toLowerCase() === b.toLowerCase();
-
-  const handleSubmit = async (imageDataUrl: string) => {
-    stopTimer();
-    setIsAnalyzing(true);
-    setShowResult(true);
-
-    try {
-      const result = await analyzeDrawing(imageDataUrl)
-      setAiResult(result);
-
-      const isCorrect = checkMatch(result, wordRef.current);
-      if (isCorrect) {
-        scoreRef.current += POINTS_PER_ATTEMPT;
-        setScore(scoreRef.current);
-      }
-
-      setAttempts((prev) => {
-        const newAttempts = prev + 1;
-        const handleEndOrNext = () => {
-          if (newAttempts >= MAX_ATTEMPTS) {
-            updateUserScore(scoreRef.current);
-            setGameOver(true);
-          } else {
-            startNewRound();
-          }
-        };
-        setTimeout(handleEndOrNext, WAIT_AFTER_RESULT);
-        return newAttempts;
-      });
-    } catch (error) {
-      console.error("Errore analisi immagine:", error);
-      alert("Errore durante l'analisi. Riprova.");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
 
   useEffect(() => {
     resetGame();
@@ -249,7 +369,10 @@ const ScreebAi = () => {
                       <span
                         className="font-bold text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1 rounded-full inline-block mt-1"
                         style={{
-                          backgroundColor: checkMatch(aiResult || "", wordRef.current)
+                          backgroundColor: checkMatch(
+                            aiResult || "",
+                            wordRef.current
+                          )
                             ? "#10b981"
                             : "#ef4444",
                           color: "white",
@@ -259,7 +382,10 @@ const ScreebAi = () => {
                           ? t("screebai.correct", {
                               points: POINTS_PER_ATTEMPT.toString(),
                             })
-                          : t("screebai.notMatching") + ' "' + wordRef.current + '"'}
+                          : t("screebai.notMatching") +
+                            ' "' +
+                            wordRef.current +
+                            '"'}
                       </span>
                     </div>
                   )}
@@ -269,7 +395,10 @@ const ScreebAi = () => {
           </div>
 
           <div className="flex-grow pb-14 sm:pb-12 md:pb-0 h-full">
-            <ScreebaiCanvas onSubmit={handleSubmit} />
+            <ScreebaiCanvas
+              onSubmit={handleSubmit}
+              setCanvasRef={setCanvasRef}
+            />
           </div>
         </>
       )}
