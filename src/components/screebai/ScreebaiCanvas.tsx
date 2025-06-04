@@ -224,7 +224,7 @@ const ScreebaiCanvas = ({ onSubmit, setCanvasRef }: DrawingCanvasProps) => {
             className={`px-3 py-1.5 rounded-xl text-sm font-medium ${currentTool === 'pen' ? 'bg-gradient-to-r from-[#8257e6] to-[#c026d3] text-white' : 'bg-[#334155] text-white'}`}
             onClick={() => setCurrentTool('pen')}
           >
-            {t("screebai.submit")}
+            {t("screebai.pen")}
           </button>
           <button
             className={`px-3 py-1.5 rounded-xl text-sm font-medium ${currentTool === 'eraser' ? 'bg-gradient-to-r from-[#8257e6] to-[#c026d3] text-white' : 'bg-[#334155] text-white'}`}

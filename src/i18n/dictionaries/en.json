@@ -89,6 +89,7 @@
     "drawAndGuess": "Draw and let AI guess!",
     "drawInstructions": "Draw the shown word and the artificial intelligence will try to guess it",
     "submit": "Submit",
+    "pen": "Pen",
     "erase": "Eraser",
     "eraseAll": "Clear all",
     "attempts": "Attempt:",

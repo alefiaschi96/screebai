@@ -341,7 +341,7 @@ const ScreebAi = () => {
               {t("games.goToHome")}
             </button>
           </div>
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center w-4/5 mx-auto">
             <div
               onClick={() =>
                 window.open(
