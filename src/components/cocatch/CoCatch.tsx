@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Locale } from "@/i18n/settings";
+import { useRouter } from 'next/navigation';
 
 // Immagini normali che aumentano il punteggio quando cliccate
 const normalImages = [
@@ -40,6 +41,7 @@ const CoCatch = () => {
   const { t } = useTranslation(locale);
   const { user, userScore, updateScore } = useAuth();
   const gameAreaRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Stati del gioco
   const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -331,19 +333,47 @@ const CoCatch = () => {
 
       {/* Game over screen */}
       {gameOver ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-            {t("cocatch.gameOver")}
-          </h2>
-          <p className="text-xl text-white mb-6">
-            {t("cocatch.finalScore")}: {score}
-          </p>
-          <button
-            className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
-            onClick={startGame}
-          >
-            {t("cocatch.playAgain")}
-          </button>
+        <div>
+          <div className="flex flex-col items-center justify-center h-full min-h-[40vh] text-center mx-auto max-w-md px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              {t("cocatch.gameOver")}
+            </h2>
+            <p className="text-xl text-white mb-6">
+              {t("cocatch.finalScore")}: {score}
+            </p>
+            <button
+              className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
+              onClick={startGame}
+            >
+              {t("cocatch.playAgain")}
+            </button>
+            <button
+              className="mt-4 px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
+              onClick={() => router.push(`/${locale}`)}
+            >
+              {t("games.goToHome")}
+            </button>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <div
+              onClick={() =>
+                window.open(
+                  "https://tally.so/r/wMq66Y",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+              className="z-1 col-span-1 lg:col-span-2 bg-[#1e293b] rounded-lg border border-[#334155] p-6 text-center cursor-pointer hover:bg-[#1a202c] transition-colors duration-300"
+              role="button"
+              aria-label={t("home.gadgetMessage")}
+            >
+              <span className="text-[#94a3b8] text-xl">
+                {t("home.gadgetMessage1")}
+                <br />
+                {t("home.gadgetMessage2")}
+              </span>
+            </div>
+          </div>
         </div>
       ) : !gameStarted ? (
         <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
@@ -370,7 +400,8 @@ const CoCatch = () => {
           className="flex-grow relative bg-[#1e293b] rounded-2xl overflow-hidden"
           style={{
             minHeight: "300px",
-            height: "calc(90vh - 120px)", /* 90% della viewport meno lo spazio per header/punteggio */
+            height:
+              "calc(90vh - 120px)" /* 90% della viewport meno lo spazio per header/punteggio */,
             width: "100%",
             margin: "0 auto",
           }}

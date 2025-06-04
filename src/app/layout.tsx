@@ -46,6 +46,26 @@ export default function RootLayout({
             <main className="flex-grow overflow-y-auto">{children}</main>
           </div>
         </AuthProvider>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-NMWG693NL6"
+          strategy="afterInteractive"
+          id="google-analytics"
+        />
+        <Script
+          id="google-analytics-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-NMWG693NL6');
+            `,
+          }}
+        />
+        
+        {/* Cookie Script */}
         <Script
           src="//cdn.cookie-script.com/s/b931bc6491cc59d879c3516b5c342fd9.js"
           strategy="afterInteractive"
