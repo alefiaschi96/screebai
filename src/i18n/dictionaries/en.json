@@ -62,7 +62,8 @@
     "game2": {
       "title": "CoCatch",
       "description": "Catch the Codeployer"
-    }
+    },
+    "goToHome": "Go to home"
   },
   "leaderboard": {
     "title": "Leaderboard",

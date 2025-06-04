@@ -2,11 +2,18 @@
 
 import GamesPage from "@/components/games/page";
 import { useAuth } from "@/contexts/AuthContext";
-import React, { use, useEffect } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Locale } from "@/i18n/settings";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+
+// Componente semplice per il loader
+const LoadingIndicator = () => (
+  <div className="flex justify-center items-center h-full w-full py-20">
+    <div className="w-12 h-12 border-4 border-[#8257e6] border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function LocalizedHome({
   params,
@@ -19,20 +26,27 @@ export default function LocalizedHome({
   // Utilizziamo l'hook per le traduzioni
   const { t } = useTranslation(locale);
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Reindirizza alla pagina di login se l'utente non è autenticato
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      console.log("Redirecting to login");
-      router.replace(`/${locale}/login`);
+    // Esegui il controllo solo quando lo stato di autenticazione è noto
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        console.log("Redirecting to login");
+        router.replace(`/${locale}/login`);
+      } else {
+        // Se l'utente è autenticato, segna il controllo come completato
+        setAuthChecked(true);
+      }
     }
   }, [isLoading, isAuthenticated, locale, router]);
 
-  // Mostra un loader durante il caricamento
-  if (isLoading) {
+  // Mostra un loader durante il caricamento o prima della redirezione
+  if (isLoading || !authChecked) {
     return (
       <div className="flex flex-col flex-grow w-full h-full">
-        <GamesPage params={params} />
+        <LoadingIndicator />
       </div>
     );
   }
@@ -103,7 +117,7 @@ export default function LocalizedHome({
                   "noopener,noreferrer"
                 )
               }
-              className="z-1 col-span-1 lg:col-span-2 bg-[#1e293b] rounded-lg border border-[#334155] p-6 text-center cursor-pointer hover:bg-[#1a202c] transition-colors duration-300"
+              className="z-10 col-span-1 lg:col-span-2 bg-[#1e293b] rounded-lg border border-[#334155] p-6 text-center cursor-pointer hover:bg-[#1a202c] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               role="button"
               aria-label={t("home.gadgetMessage")}
             >

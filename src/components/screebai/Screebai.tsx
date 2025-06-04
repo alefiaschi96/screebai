@@ -10,6 +10,7 @@ import { getRandomWord } from "@/data/words";
 import { analyzeDrawing } from "@/services/openaiService";
 import { uploadDrawing, deleteDrawing } from "@/services/storageService";
 import ScreebaiCanvas from "./ScreebaiCanvas";
+import { useRouter } from "next/navigation";
 
 const ScreebAi = () => {
   const params = useParams();
@@ -47,6 +48,8 @@ const ScreebAi = () => {
       timerRef.current = null;
     }
   };
+
+  const router = useRouter();
 
   // Riferimento al canvas per accedervi quando scade il timer
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
@@ -195,17 +198,22 @@ const ScreebAi = () => {
           clearInterval(timerRef.current!);
           if (!isAnalyzing && !hasSubmittedRef.current) {
             hasSubmittedRef.current = true;
-            
+
             // Cerca il canvas nel DOM se il riferimento non è disponibile
-            const canvas = canvasRef || document.querySelector("canvas") as HTMLCanvasElement;
-            
+            const canvas =
+              canvasRef ||
+              (document.querySelector("canvas") as HTMLCanvasElement);
+
             if (canvas) {
               try {
                 // Ottieni l'immagine con sfondo bianco usando la stessa logica di ScreebaiCanvas
                 const imageDataUrl = getImageWithWhiteBackground(canvas);
                 handleSubmit(imageDataUrl);
               } catch (error) {
-                console.error("Errore durante l'acquisizione dell'immagine:", error);
+                console.error(
+                  "Errore durante l'acquisizione dell'immagine:",
+                  error
+                );
                 // Fallback: invia un'immagine vuota se non riusciamo a ottenere quella dal canvas
                 const emptyCanvas = document.createElement("canvas");
                 emptyCanvas.width = 400;
@@ -312,19 +320,47 @@ const ScreebAi = () => {
       )}
 
       {gameOver ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-            {t("screebai.gameOver")}
-          </h2>
-          <p className="text-xl text-white mb-6">
-            {t("screebai.finalScore")}: {scoreRef.current}
-          </p>
-          <button
-            className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
-            onClick={resetGame}
-          >
-            {t("screebai.playAgain")}
-          </button>
+        <div>
+          <div className="flex flex-col items-center justify-center h-full min-h-[40vh] text-center mx-auto max-w-md px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              {t("screebai.gameOver")}
+            </h2>
+            <p className="text-xl text-white mb-6">
+              {t("screebai.finalScore")}: {scoreRef.current}
+            </p>
+            <button
+              className="px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
+              onClick={resetGame}
+            >
+              {t("screebai.playAgain")}
+            </button>
+            <button
+              className="mt-4 px-4 py-2 rounded-2xl font-semibold bg-gradient-to-r from-[#8257e6] via-[#c026d3] to-[#f59e0b] text-white hover:opacity-90 transition-opacity"
+              onClick={() => router.push(`/${locale}`)}
+            >
+              {t("games.goToHome")}
+            </button>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <div
+              onClick={() =>
+                window.open(
+                  "https://tally.so/r/wMq66Y",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+              className="z-1 col-span-1 lg:col-span-2 bg-[#1e293b] rounded-lg border border-[#334155] p-6 text-center cursor-pointer hover:bg-[#1a202c] transition-colors duration-300"
+              role="button"
+              aria-label={t("home.gadgetMessage")}
+            >
+              <span className="text-[#94a3b8] text-xl">
+                {t("home.gadgetMessage1")}
+                <br />
+                {t("home.gadgetMessage2")}
+              </span>
+            </div>
+          </div>
         </div>
       ) : !gameStarted ? (
         <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center mx-auto max-w-md px-4">
@@ -395,7 +431,14 @@ const ScreebAi = () => {
             </div>
           </div>
 
-          <div className="flex-grow pb-14 sm:pb-12 md:pb-0 h-full" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column' }}>
+          <div
+            className="flex-grow pb-14 sm:pb-12 md:pb-0 h-full"
+            style={{
+              minHeight: "60vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <ScreebaiCanvas
               onSubmit={handleSubmit}
               setCanvasRef={setCanvasRef}

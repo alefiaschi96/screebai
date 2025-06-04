@@ -62,7 +62,8 @@
     "game2": {
       "title": "CoCatch",
       "description": "Acchiappa il Codeployer"
-    }
+    },
+    "goToHome": "Torna alla home"
   },
   "leaderboard": {
     "title": "Classifica",
