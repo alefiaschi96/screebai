@@ -14,7 +14,7 @@ export type LeaderboardEntry = {
   position: number;
 };
 
-export default function Leaderboard({ locale }: { locale: Locale }) {
+export default function Leaderboard({ locale, maxEntries = 10 }: { locale: Locale; maxEntries?: number }) {
   const { t } = useTranslation(locale);
   const { userScore } = useAuth();
 
@@ -63,9 +63,9 @@ export default function Leaderboard({ locale }: { locale: Locale }) {
       // Prima otteniamo la classifica completa per avere le posizioni corrette
       const fullLeaderboard = await fetchFullLeaderboard();
       
-      // Se non c'è un termine di ricerca, mostriamo la classifica completa
+      // Se non c'è un termine di ricerca, mostriamo la classifica troncata in base a maxEntries
       if (!search || search.trim() === "") {
-        setLeaderboard(fullLeaderboard);
+        setLeaderboard(fullLeaderboard.slice(0, maxEntries));
         return;
       }
       
@@ -74,7 +74,8 @@ export default function Leaderboard({ locale }: { locale: Locale }) {
         entry.user_nick.toLowerCase().includes(search.trim().toLowerCase())
       );
       
-      setLeaderboard(filteredData);
+      // Anche nei risultati di ricerca, rispettiamo il limite di maxEntries
+      setLeaderboard(filteredData.slice(0, maxEntries));
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError(t("leaderboard.fetchError"));

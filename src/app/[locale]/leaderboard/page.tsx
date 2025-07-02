@@ -35,7 +35,7 @@ export default function LeaderboardPage({
         </p>
       </div>
       <div className="flex-grow overflow-hidden rounded-lg">
-        <Leaderboard locale={locale} />
+        <Leaderboard locale={locale} maxEntries={20} />
       </div>
     </div>
   );

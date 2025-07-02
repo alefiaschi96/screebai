@@ -76,6 +76,24 @@ export default function Navbar() {
               <>
                 {user && userScore ? (
                   <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => handleNav(`/${locale}/leaderboard`)}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gradient-to-r from-[#8257e6] to-[#6366f1] text-white shadow-sm hover:from-[#7c51d4] hover:to-[#5a5fcf] transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+                    >
+                      <svg
+                        className="mr-2 h-5 w-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {t("navbar.leaderboard")}
+                    </button>
                     <span className="text-sm text-white font-bold">
                       {userScore.user_nick || user.email}
                     </span>
@@ -116,26 +134,24 @@ export default function Navbar() {
 
           {/* Mobile menu */}
           <div className="flex items-center sm:hidden space-x-2">
-            {user?.email && user.email.includes('@codeploy') && (
-              <button
-                onClick={() => handleNav(`/${locale}/leaderboard`)}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            <button
+              onClick={() => handleNav(`/${locale}/leaderboard`)}
+              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md hover:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f172a] focus:ring-[#6366f1]"
+            >
+              <svg
+                className="mr-1 h-4 w-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  className="mr-1 h-4 w-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {t("navbar.leaderboard")}
-              </button>
-            )}
+                <path
+                  fillRule="evenodd"
+                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t("navbar.leaderboard")}
+            </button>
 
             {/* Menu button */}
             <button
@@ -271,28 +287,26 @@ export default function Navbar() {
                             />
                           </svg>
                         </button>
-
-                        {user?.email && user.email.includes('@codeploy') && (
-                          <button
-                            onClick={() => handleNav(`/${locale}/leaderboard`)}
-                            className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
+                        <button
+                          onClick={() => handleNav(`/${locale}/leaderboard`)}
+                          className="flex items-center justify-between w-full p-3 bg-[#1e293b] border border-[#334155] rounded-lg hover:bg-[#2d3748] text-left"
+                        >
+                          <span className="text-white">
+                            {t("navbar.leaderboard")}
+                          </span>
+                          <svg
+                            className="h-5 w-5 text-gray-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <span className="text-white">{t("navbar.leaderboard")}</span>
-                            <svg
-                              className="h-5 w-5 text-gray-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                        )}
-
+                            <path
+                              fillRule="evenodd"
+                              d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
                         {/* Language switcher */}
                         <div className="bg-[#1e293b] rounded-lg p-3 border border-[#334155]">
                           <div className="flex flex-col space-y-2">

@@ -7,6 +7,7 @@ import { Locale } from "@/i18n/settings";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Leaderboard from "@/components/leaderboard/Leaderboard";
 
 // Componente semplice per il loader
 const LoadingIndicator = () => (
@@ -63,7 +64,7 @@ export default function LocalizedHome({
           className="absolute top-[43%] right-[0%] w-[200px] h-[200px] opacity-35 rotate-15"
           priority
         />
-        
+
         {/* Immagini aggiuntive disposte casualmente - senza sovrapposizioni */}
         <Image
           src="/images/05-min.png"
@@ -72,7 +73,7 @@ export default function LocalizedHome({
           height={300}
           className="absolute top-[15%] left-[5%] w-[200px] h-[200px] opacity-15"
         />
-        
+
         <Image
           src="/images/10-min.png"
           alt="Background element"
@@ -99,11 +100,11 @@ export default function LocalizedHome({
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* <div className="hidden lg:block lg:col-span-1 bg-[#1e293b] rounded-lg border border-[#334155] p-4">
-            <Leaderboard locale={locale} />
-          </div> */}
-          <div className="col-span-1 lg:col-span-2 bg-[#1e293b] rounded-lg border border-[#334155] p-4">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="hidden lg:block bg-[#1e293b] rounded-lg border border-[#334155] p-4">
+            <Leaderboard locale={locale} maxEntries={5} />
+          </div>
+          <div className="bg-[#1e293b] rounded-lg border border-[#334155] p-4">
             <GamesPage params={params} />
           </div>
 
